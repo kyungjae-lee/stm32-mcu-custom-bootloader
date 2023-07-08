@@ -126,6 +126,11 @@ void Error_Handler(void);
 
 /* USER CODE END Private defines */
 
+/* Bootloader function prototypes */
+void bootloader_uart_read_data(void);
+void bootloader_jump_to_user_app(void);
+
+
 #ifdef __cplusplus
 }
 #endif
