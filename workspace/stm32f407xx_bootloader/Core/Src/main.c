@@ -140,12 +140,45 @@ void bootloader_uart_read_data(void)
 {
 }
 
+/* Jump to the user application.
+ * Here, we are assuming that the FLASH_SECTOR2_BASE_ADDRESS is where the user
+ * application is stored
+ * Note: Make sure to uncomment 'USER_VECT_TAB_ADDRESS' macro in the 
+ *       system_stm32f4xx.c file since we are relocating the vector table.
+ */
 void bootloader_jump_to_user_app(void)
 {
+	/* Function pointer to hold the address ofthe reset handler of the user app */
+	void (*app_reset_handler)(void);
+	
+	printmsg("BL_DEBUG_MSG: bootloader_jump_to_user_app()\n");
+	
+	/* 1. Configure the MSP by reading the value from the base address of the sector 2.
+	 *    The very first element of the vector table holds the initial value of the msp.
+	 */
+	uint32_t msp = *(volatile uint32_t *)FLASH_SECTOR2_BASE_ADDRESS;
+	printmsg("BL_DEBUG_MSG: MSP: %#x\n", msp);
+	
+	/* This function comes from CMSIS */
+	__set_MSP(msp);
+	
+	//SCB->VTOR = FLASH_SECTOR1_BASE_ADDRESS;
+	
+	/* 2. Fetch the address of the Reset_Handler() of the user application from
+	 *    the location FLASH_SECTOR2_BASE_ADDRESS+4
+	 */
+	uint32_t resethandler_addr = *(volatile uint32_t *)(FLASH_SECTOR2_BASE_ADDRESS + 4);
+	
+	app_reset_handler = (void *)resethandler_addr;
+	
+	printmsg("BL_DEBUG_MSG: User application Reset_Handler() address: %#x\n", app_reset_handler);
+	
+	/* Jumpt to the Reset_Handler() of the user application */
+	app_reset_handler();
 }
 
 
-/* Print a formatted string to console over USART */
+/* Print a formatted string to console over USART for debugging */
 void printmsg(char *format, ...)
 {
 #ifdef BL_DEBUG_MSG_EN
