@@ -32,6 +32,8 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include <stdint.h>
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -53,6 +55,31 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+
+/* Bootloader command handler functions */
+void Bootloader_GetVer_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_GetHelp_Cmd_Handler(uint8_t *pBuffer);
+void Bootloader_GetCID_Cmd_Handler(uint8_t *pBuffer);
+void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBuffer);
+void Bootloader_GoToAddr_Cmd_Handler(uint8_t *pBuffer);
+void Bootloader_EraseFlash_Cmd_Handler(uint8_t *pBuffer);
+void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBuffer);
+void Bootloader_EnDisRWProtect_Cmd_Handler(uint8_t *pBuffer);
+void Bootloader_ReadMem_Cmd_Handler(uint8_t *pBuffer);
+void Bootloader_ReadProtectStatus_Cmd_Handler(uint8_t *pBuffer);
+void Bootloader_ReadOTP_Cmd_Handler(uint8_t *pBuffer);
+
+/* Bootloader helper functions */
+void Bootloader_Tx_ACK(uint8_t cmdCode, uint8_t lenToFollow);
+void Bootloader_Tx_NACK(void);
+uint8_t Bootloader_Verify_CRC(uint8_t *pPacket, uint32_t len, uint32_t crcHost);
+void Bootloader_UART_Write_Data(uint8_t *pBuffer, uint32_t len);
+uint8_t Get_Bootloader_Version(void);
+
+/* Bootloader function prototypes */
+void Bootloader_UART_Read_Data(void);
+void Bootloader_Jump_To_User_App(void);
+
 
 /* USER CODE END EFP */
 
@@ -126,11 +153,31 @@ void Error_Handler(void);
 
 #define FLASH_SECTOR2_BASE_ADDRESS 0x08008000U
 
-/* USER CODE END Private defines */
+/* Bootloader version */
+#define BL_VERSION				0x10
 
-/* Bootloader function prototypes */
-void bootloader_uart_read_data(void);
-void bootloader_jump_to_user_app(void);
+/* Bootloader command codes */
+#define BL_GET_VER				0x51
+#define BL_GET_HELP				0x52
+#define BL_GET_CID				0x53
+#define BL_GET_RDP_STATUS		0x54
+#define BL_GO_TO_ADDR			0x55
+#define BL_ERASE_FLASH			0x56
+#define BL_WRITE_MEM			0x57
+#define BL_ENDIS_RW_PROTECT		0x58
+#define BL_READ_MEM				0x59
+#define	BL_READ_PROTECT_STATUS	0x5A
+#define BL_READ_OTP				0x5B
+
+/* Bootloader ACK and NACK bytes */
+#define BL_ACK					0xA5
+#define BL_NACK					0x7F
+
+/* CRC verification results */
+#define CRC_VERIFICATION_SUCCESS	0
+#define CRC_VERIFICATION_FAIL		1
+
+/* USER CODE END Private defines */
 
 
 #ifdef __cplusplus
