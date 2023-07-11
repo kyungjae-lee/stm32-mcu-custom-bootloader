@@ -61,6 +61,18 @@ UART_HandleTypeDef huart3;
 char data[] = "Message from bootloader\r\n";
 uint8_t blRxBuffer[BL_RX_LEN];
 
+uint8_t supportedCmds[] = {
+	BL_GET_VER,
+	BL_GET_HELP,
+	BL_GET_CID,
+	BL_GET_RDP_STATUS,
+	BL_GO_TO_ADDR,
+	BL_ERASE_FLASH,
+	BL_WRITE_MEM,
+	BL_READ_PROTECT_STATUS
+};
+	
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -142,7 +154,7 @@ int main(void)
 
 void Bootloader_UART_Read_Data(void)
 {
-	uint8_t rcv_len = 0;
+	uint8_t rcvLen = 0;
 	
 	while (1)
 	{
@@ -152,10 +164,10 @@ void Bootloader_UART_Read_Data(void)
 		
 		/* First, read the first byte (i.e., the "Length to follow" field ) */
 		HAL_UART_Receive(C_UART, blRxBuffer, 1, HAL_MAX_DELAY);
-		rcv_len = blRxBuffer[0];	/* Number of the remaining bytes to read */
+		rcvLen = blRxBuffer[0];	/* Number of the remaining bytes to read */
 		
 		/* Second, read the remaining bytes, first of which is the "Command code" */
-		HAL_UART_Receive(C_UART, &blRxBuffer[1], rcv_len, HAL_MAX_DELAY);
+		HAL_UART_Receive(C_UART, &blRxBuffer[1], rcvLen, HAL_MAX_DELAY);
 		
 		/* Decode the command code */
 		switch (blRxBuffer[1])
@@ -537,12 +549,17 @@ static void MX_GPIO_Init(void)
 
 /* Implementation of the bootloader command handler functions */
 
-/* Helper function to handle BL_GET_VER command */
+/**
+ * @brief	Handles BL_GET_VER command
+ * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * @retval	None
+ * @note	BL_GET_VER command is used to read the bootloader version from the 
+ *  		MCU.
+ */
 void Bootloader_GetVer_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 	uint8_t blVersion;
 	
-	/* 1. Verify the checksum value */
 	Print_Msg("BL_DEBUG_MSG: bootloader_getver_cmd_handler()\n");
 	
 	/* Total length of the command packet */
@@ -551,7 +568,7 @@ void Bootloader_GetVer_Cmd_Handler(uint8_t *pBLRxBuffer)
 	/* Extract the CRC32 sent by the host */
 	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
 	
-	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], pBLRxBuffer[0] - 4, crcHost))
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
 	{
 		/* Checksum is correct */
 		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
@@ -574,53 +591,167 @@ void Bootloader_GetVer_Cmd_Handler(uint8_t *pBLRxBuffer)
 	}
 }
 
-/* Helper function to handle BL_GET_HELP command */
-void Bootloader_GetHelp_Cmd_Handler(uint8_t *bl_rx_buffer)
+/**
+ * @brief	Handles BL_GET_HELP command
+ * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * @retval	None
+ * @note	BL_GET_HELP command is used to retrieve all the commands that are 
+ * 			supported by the bootloader.
+ */
+void Bootloader_GetHelp_Cmd_Handler(uint8_t *pBLRxBuffer)
+{
+	Print_Msg("BL_DEBUG_MSG: Bootloader_GetHelp_Cmd_Handler()\n");
+	
+	/* Total length of the command packet */
+	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
+	
+	/* Extract the CRC32 sent by the host */
+	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
+
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
+	{
+		/* Checksum is correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
+		
+		/* Send ACK */
+		Bootloader_Tx_ACK(pBLRxBuffer[0], sizeof(supportedCmds));
+		
+		/* Send response to the host */
+		Bootloader_UART_Write_Data(supportedCmds, sizeof(supportedCmds));
+	}
+	else
+	{
+		/* Checksum is not correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
+		
+		/* Send NACK */
+		Bootloader_Tx_NACK();
+	}
+}
+
+/**
+ * @brief	Handles BL_GET_CID command
+ * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * @retval	None
+ * @note	BL_GET_CID command is used to read the MCU chip identification
+ *			number.
+ *			This function can be updated to read the Revision Identifier
+ *			(REV_ID) as well.
+ */
+void Bootloader_GetCID_Cmd_Handler(uint8_t *pBLRxBuffer)
+{
+	Print_Msg("BL_DEBUG_MSG: Bootloader_GetCID_Cmd_Handler()\n");
+	
+	uint16_t cid;
+
+	/* Total length of the command packet */
+	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
+	
+	/* Extract the CRC32 sent by the host */
+	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
+
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
+	{
+		/* Checksum is correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
+		
+		/* Send ACK */
+		Bootloader_Tx_ACK(pBLRxBuffer[0], 2);
+		
+		cid = Get_MCU_Chip_ID();
+		Print_Msg("BL_DEBUG_MSG: MCU Chip ID: %d %#x\n", cid, cid);
+		
+		/* Send response to the host */
+		Bootloader_UART_Write_Data((uint8_t *)&cid, 2);
+	}
+	else
+	{
+		/* Checksum is not correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
+		
+		/* Send NACK */
+		Bootloader_Tx_NACK();
+	}
+}
+
+/**
+ * @brief	Handles BL_GET_RDP command
+ * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * @retval	None
+ * @note	BL_GET_RDP command is used to read the Flash Protection (RDP)
+ *			Level.
+ */
+void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 }
 
-/* Helper function to handle BL_GET_CID command */
-void Bootloader_GetCID_Cmd_Handler(uint8_t *bl_rx_buffer)
+/**
+ * @brief	Handles BL_GO_TO_ADDR command
+ * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * @retval	None
+ * @note	
+ */
+void Bootloader_GoToAddr_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 }
 
-/* Helper function to handle BL_GET_RDP command */
-void Bootloader_GetRDP_Cmd_Handler(uint8_t *bl_rx_buffer)
+/**
+ * @brief	Handles BL_ERASE_FLASH command
+ * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * @retval	None
+ * @note	
+ */
+void Bootloader_EraseFlash_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 }
 
-/* Helper function to handle BL_GO_TO_ADDR command */
-void Bootloader_GoToAddr_Cmd_Handler(uint8_t *bl_rx_buffer)
+/**
+ * @brief	Handles BL_WRITE_MEM command
+ * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * @retval	None
+ * @note	
+ */
+void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 }
 
-/* Helper function to handle BL_ERASE_FLASH command */
-void Bootloader_EraseFlash_Cmd_Handler(uint8_t *bl_rx_buffer)
+/**
+ * @brief	Handles BL_ENDIS_RW_PROTECT command
+ * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * @retval	None
+ * @note	
+ */
+void Bootloader_EnDisRWProtect_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 }
 
-/* Helper function to handle BL_WRITE_MEM command */
-void Bootloader_WriteMem_Cmd_Handler(uint8_t *bl_rx_buffer)
+/**
+ * @brief	Handles BL_READ_MEM command
+ * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * @retval	None
+ * @note	
+ */
+void Bootloader_ReadMem_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 }
 
-/* Helper function to handle BL_ENDIS_RW_PROTECT command */
-void Bootloader_EnDisRWProtect_Cmd_Handler(uint8_t *bl_rx_buffer)
+/**
+ * @brief	Handles BL_READ_PROTECT_STATUS command
+ * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * @retval	None
+ * @note	
+ */
+void Bootloader_ReadProtectStatus_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 }
 
-/* Helper function to handle BL_READ_MEM command */
-void Bootloader_ReadMem_Cmd_Handler(uint8_t *bl_rx_buffer)
-{
-}
-
-/* Helper function to handle BL_READ_PROTECT_STATUS command */
-void Bootloader_ReadProtectStatus_Cmd_Handler(uint8_t *bl_rx_buffer)
-{
-}
-
-/* Helper function to handle BL_READ_OTP command */
-void Bootloader_ReadOTP_Cmd_Handler(uint8_t *bl_rx_buffer)
+/**
+ * @brief	Handles BL_READ_OTP command
+ * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * @retval	None
+ * @note	
+ */
+void Bootloader_ReadOTP_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 }
 
@@ -658,12 +789,17 @@ uint8_t Bootloader_Verify_CRC(uint8_t *pPacket, uint32_t len, uint32_t crcHost)
 	{
 		uint32_t dataByte = pPacket[i];
 		crc = HAL_CRC_Accumulate(&hcrc, &dataByte, 1);
-		
-		if (crc == crcHost)
-		{
-			return CRC_VERIFICATION_SUCCESS;
-		}
 	}
+	/* Reset CRC Calculation unit.
+	 * Without this, all CRC checks following the very first wone will fail.
+	 */
+	__HAL_CRC_DR_RESET(&hcrc);
+		
+	if (crc == crcHost)
+	{
+		return CRC_VERIFICATION_SUCCESS;
+	}
+	
 	return CRC_VERIFICATION_FAIL;
 }
 
@@ -686,6 +822,20 @@ void Bootloader_UART_Write_Data(uint8_t *pBuffer, uint32_t len)
 uint8_t Get_Bootloader_Version(void)
 {
 	return (uint8_t)BL_VERSION;
+}
+
+/**
+ * @brief	Returns the chip (or device) identifier
+ * @param	None
+ * @retval	16-bit MCU chip identification number
+ * @note	For more information, see the "MCU device ID code" section of the
+ *			MCU reference manual. (DBGMCU_IDCODE; Address: 0xE0042000)
+ *			- Bit[31:16] - Revision identifier (REV_ID)
+ *			- Bit[11:0] - Device identifier (DEV_ID) - 0x413
+ */
+uint16_t Get_MCU_Chip_ID(void)
+{
+	return (uint16_t)(DBGMCU->IDCODE) & 0x0FFF;
 }
 
 /* USER CODE END 4 */

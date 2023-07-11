@@ -58,16 +58,16 @@ void Error_Handler(void);
 
 /* Bootloader command handler functions */
 void Bootloader_GetVer_Cmd_Handler(uint8_t *pBLRxBuffer);
-void Bootloader_GetHelp_Cmd_Handler(uint8_t *pBuffer);
-void Bootloader_GetCID_Cmd_Handler(uint8_t *pBuffer);
-void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBuffer);
-void Bootloader_GoToAddr_Cmd_Handler(uint8_t *pBuffer);
-void Bootloader_EraseFlash_Cmd_Handler(uint8_t *pBuffer);
-void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBuffer);
-void Bootloader_EnDisRWProtect_Cmd_Handler(uint8_t *pBuffer);
-void Bootloader_ReadMem_Cmd_Handler(uint8_t *pBuffer);
-void Bootloader_ReadProtectStatus_Cmd_Handler(uint8_t *pBuffer);
-void Bootloader_ReadOTP_Cmd_Handler(uint8_t *pBuffer);
+void Bootloader_GetHelp_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_GetCID_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_GoToAddr_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_EraseFlash_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_EnDisRWProtect_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_ReadMem_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_ReadProtectStatus_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_ReadOTP_Cmd_Handler(uint8_t *pBLRxBuffer);
 
 /* Bootloader helper functions */
 void Bootloader_Tx_ACK(uint8_t cmdCode, uint8_t lenToFollow);
@@ -75,6 +75,8 @@ void Bootloader_Tx_NACK(void);
 uint8_t Bootloader_Verify_CRC(uint8_t *pPacket, uint32_t len, uint32_t crcHost);
 void Bootloader_UART_Write_Data(uint8_t *pBuffer, uint32_t len);
 uint8_t Get_Bootloader_Version(void);
+uint16_t Get_MCU_Chip_ID(void);
+
 
 /* Bootloader function prototypes */
 void Bootloader_UART_Read_Data(void);
@@ -154,7 +156,7 @@ void Bootloader_Jump_To_User_App(void);
 #define FLASH_SECTOR2_BASE_ADDRESS 0x08008000U
 
 /* Bootloader version */
-#define BL_VERSION				0x10
+#define BL_VERSION				0x20
 
 /* Bootloader command codes */
 #define BL_GET_VER				0x51
