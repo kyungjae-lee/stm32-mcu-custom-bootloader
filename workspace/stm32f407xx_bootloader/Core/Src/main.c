@@ -689,7 +689,8 @@ void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBLRxBuffer)
  * @brief	Handles BL_GO_TO_ADDR command
  * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
  * @retval	None
- * @note	
+ * @note	BL_GO_TO_ADDR command is used to jump bootloader to specified 
+ *			address.
  */
 void Bootloader_GoToAddr_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
@@ -699,7 +700,8 @@ void Bootloader_GoToAddr_Cmd_Handler(uint8_t *pBLRxBuffer)
  * @brief	Handles BL_ERASE_FLASH command
  * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
  * @retval	None
- * @note	
+ * @note	BL_ERASE_FLASH command is used to mass erase or sector erase the user 
+ *			Flash.
  */
 void Bootloader_EraseFlash_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
@@ -709,7 +711,8 @@ void Bootloader_EraseFlash_Cmd_Handler(uint8_t *pBLRxBuffer)
  * @brief	Handles BL_WRITE_MEM command
  * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
  * @retval	None
- * @note	
+ * @note	BL_WRITE_MEM command is used to write data into different memories of
+ * 			the MCU.
  */
 void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
@@ -719,7 +722,8 @@ void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBLRxBuffer)
  * @brief	Handles BL_ENDIS_RW_PROTECT command
  * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
  * @retval	None
- * @note	
+ * @note	BL_ENDIS_RW_PROTECT command is used to enable read/write protection on
+ *			different sectors of the user Flash.
  */
 void Bootloader_EnDisRWProtect_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
@@ -729,7 +733,8 @@ void Bootloader_EnDisRWProtect_Cmd_Handler(uint8_t *pBLRxBuffer)
  * @brief	Handles BL_READ_MEM command
  * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
  * @retval	None
- * @note	
+ * @note	BL_WRITE_MEM command is used to read data from different memories of
+ * 			the MCU.
  */
 void Bootloader_ReadMem_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
@@ -739,7 +744,8 @@ void Bootloader_ReadMem_Cmd_Handler(uint8_t *pBLRxBuffer)
  * @brief	Handles BL_READ_PROTECT_STATUS command
  * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
  * @retval	None
- * @note	
+ * @note	BL_READ_PROTECT_STATUS command is used to read the protection status
+ *			of all the sectors of the user Flash memory.
  */
 void Bootloader_ReadProtectStatus_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
@@ -749,7 +755,7 @@ void Bootloader_ReadProtectStatus_Cmd_Handler(uint8_t *pBLRxBuffer)
  * @brief	Handles BL_READ_OTP command
  * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
  * @retval	None
- * @note	
+ * @note	BL_READ_OTP command is used to read the OTP contents
  */
 void Bootloader_ReadOTP_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
@@ -758,6 +764,12 @@ void Bootloader_ReadOTP_Cmd_Handler(uint8_t *pBLRxBuffer)
 
 /* Implementation of the bootloader helper functions */
 
+/**
+ * @brief	Sends ACK message to the host
+ * @param	cmdCode - Command code received from the host
+ * @param	lenToFollow - Length of the subsequent data bytes
+ * @retval	None
+ */
 void Bootloader_Tx_ACK(uint8_t cmdCode, uint8_t lenToFollow)
 {
 	/* ACKing incorporates 2 bytes; ACK , length to follow */
@@ -767,6 +779,11 @@ void Bootloader_Tx_ACK(uint8_t cmdCode, uint8_t lenToFollow)
 	HAL_UART_Transmit(C_UART, ackBuf, 2, HAL_MAX_DELAY);
 }
 
+/**
+ * @brief	Sends NACK message to the host
+ * @param	None
+ * @retval	None
+ */
 void Bootloader_Tx_NACK(void)
 {
 	/* NACKing incorporates 1 byte */
@@ -779,7 +796,7 @@ void Bootloader_Tx_NACK(void)
  * @param	data - Pointer to the data for which the CRC has to be calculated
  * @param	len - Length for which the CRC has to be calculated
  * @param	crc_host - 32-bit crc value sent by the host
- * @retval	0 if CRC verification was successful, 1 otherwise. 
+ * @retval	0 if CRC verification was successful, 1 otherwise.
  */
 uint8_t Bootloader_Verify_CRC(uint8_t *pPacket, uint32_t len, uint32_t crcHost)
 {
@@ -818,6 +835,7 @@ void Bootloader_UART_Write_Data(uint8_t *pBuffer, uint32_t len)
  * @brief	Returns the bootloader version macro value
  * @param	None
  * @retval	Bootloader version macro value
+ * @note	N/A
  */
 uint8_t Get_Bootloader_Version(void)
 {
