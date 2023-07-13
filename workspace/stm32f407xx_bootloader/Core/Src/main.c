@@ -722,6 +722,14 @@ void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBLRxBuffer)
  * @retval	None
  * @note	BL_GO_TO_ADDR command is used to jump bootloader to specified 
  *			address.
+ *			A good way to test this functionality is to set the target 
+ *			address to the reset handler of the user application and see if
+ *			the program successfully jumps to the user application. (Reset 
+ *			handler is the entry point to the user application)
+ *			When entering the target address to the host application, 
+ *			make sure to account for the T-bit setting. For example, 
+ *			If the address of the user application's reset handler is 
+ *			0x08008229, then enter 0x08008228.
  */
 void Bootloader_GoToAddr_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
