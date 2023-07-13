@@ -683,6 +683,37 @@ void Bootloader_GetCID_Cmd_Handler(uint8_t *pBLRxBuffer)
  */
 void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
+	uint8_t rdpLevel = 0x00;
+	Print_Msg("BL_DEBUG_MSG: Bootloader_GetRDP_Cmd_Handler()\n");
+
+	/* Total length of the command packet */
+	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
+	
+	/* Extract the CRC32 sent by the host */
+	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
+
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
+	{
+		/* Checksum is correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
+		
+		/* Send ACK */
+		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
+		
+		rdpLevel = Get_Flash_RDP_Level();
+		Print_Msg("BL_DEBUG_MSG: RDP level: %d %#x\n", rdpLevel, rdpLevel);
+		
+		/* Send response to the host */
+		Bootloader_UART_Write_Data(&rdpLevel, 1);
+	}
+	else
+	{
+		/* Checksum is not correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
+		
+		/* Send NACK */
+		Bootloader_Tx_NACK();
+	}
 }
 
 /**
@@ -854,6 +885,32 @@ uint8_t Get_Bootloader_Version(void)
 uint16_t Get_MCU_Chip_ID(void)
 {
 	return (uint16_t)(DBGMCU->IDCODE) & 0x0FFF;
+}
+
+/**
+ * @brief	Returns the Flash memory RDP (Read Protection) level
+ * @param	None
+ * @retval	8-bit RDP level
+ * @note	For more information, see the "Option Bytes" section of the MCU
+ *			reference manual.
+ *			Additional functions can be defined to handle RDP level change.
+ */
+uint8_t Get_Flash_RDP_Level(void)
+{
+	uint8_t rdpStatus = 0;
+#if 0
+	/* The following code shows how to use the APIs provided by the Flash driver
+	 * of the ST hardware abstraction layer to achieve reading the RDP status.
+	 */
+	FLASH_OBProgramInitTypeDef obHandle;
+	HAL_FLASHEx_OBGetConfig(&obHandle);
+	rdpStatus = (uint8_t)obHandle.RDPLevel;
+#else
+	volatile uint32_t *pOBAddr = (uint32_t *)0x1FFFC000; /* Option byte addr */
+	rdpStatus = (uint8_t)(*pOBAddr >> 8);	/* Extract bits[15:8] */
+#endif
+	
+	return rdpStatus;
 }
 
 /* USER CODE END 4 */

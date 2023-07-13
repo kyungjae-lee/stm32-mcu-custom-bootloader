@@ -76,6 +76,7 @@ uint8_t Bootloader_Verify_CRC(uint8_t *pPacket, uint32_t len, uint32_t crcHost);
 void Bootloader_UART_Write_Data(uint8_t *pBuffer, uint32_t len);
 uint8_t Get_Bootloader_Version(void);
 uint16_t Get_MCU_Chip_ID(void);
+uint8_t Get_Flash_RDP_Level(void);
 
 
 /* Bootloader function prototypes */
