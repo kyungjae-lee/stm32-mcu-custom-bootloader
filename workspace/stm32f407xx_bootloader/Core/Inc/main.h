@@ -77,6 +77,7 @@ void Bootloader_UART_Write_Data(uint8_t *pBuffer, uint32_t len);
 uint8_t Get_Bootloader_Version(void);
 uint16_t Get_MCU_Chip_ID(void);
 uint8_t Get_Flash_RDP_Level(void);
+uint8_t Verify_Addr(uint32_t addr);
 
 
 /* Bootloader function prototypes */
@@ -179,6 +180,19 @@ void Bootloader_Jump_To_User_App(void);
 /* CRC verification results */
 #define CRC_VERIFICATION_SUCCESS	0
 #define CRC_VERIFICATION_FAIL		1
+
+#define ADDR_VALID 				0
+#define ADDR_INVALID			1
+
+/* Some start and end addresses of different memories of STM32F407xx MCU */
+#define SRAM1_SIZE				112 * 1024 						/* 112 KB */
+#define SRAM1_END				(SRAM1_BASE + SRAM1_SIZE)
+#define SRAM2_SIZE				16 * 1024 						/* 112 KB */
+#define SRAM2_END				(SRAM2_BASE + SRAM1_SIZE)
+#define FLASH_SIZE				1024 * 1024						/* 1 MB */
+#define BKPSRAM_SIZE			4 * 1024						/* 4 KB */
+#define BKPSRAM_END				(BKPSRAM_BASE + BKPSRAM_SIZE)
+
 
 /* USER CODE END Private defines */
 

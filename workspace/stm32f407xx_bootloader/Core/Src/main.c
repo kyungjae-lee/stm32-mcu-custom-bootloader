@@ -725,6 +725,61 @@ void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBLRxBuffer)
  */
 void Bootloader_GoToAddr_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
+	uint32_t targetAddr = 0;
+	uint8_t addrValid = ADDR_VALID;
+	uint8_t addrInvalid = ADDR_INVALID;
+	
+	Print_Msg("BL_DEBUG_MSG: Bootloader_GoToAddr_Cmd_Handler\n");
+	
+	/* Total length of the command packet */
+	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
+	
+	/* Extract the CRC32 sent by the host */
+	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
+
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
+	{
+		/* Checksum is correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
+		
+		/* Send ACK */
+		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
+		
+		targetAddr = *((uint32_t *)&pBLRxBuffer[2]);
+		Print_Msg("BL_DEBUG_MSG: Target address to jump to: %#x\n", targetAddr);
+		
+		if (Verify_Addr(targetAddr) == ADDR_VALID)
+		{
+			/* Notify the host that the address is valid */
+			Bootloader_UART_Write_Data(&addrValid, 1);
+			
+			/* Jump to addr.
+			 * Not executing the following line will trigger the hardfault
+			 * exception for ARM Cortex-M processors.
+			 * https://www.youtube.com/watch?v=VX_12SjnNhY
+			 */
+			targetAddr += 1;	/* Set T-bit to 1 */
+			
+			void (*jumpToTargetAddr)(void) = (void *)targetAddr;
+			
+			Print_Msg("BL_DEBUG_MSG: Jumping to the target address\n");
+			
+			jumpToTargetAddr();
+		}
+		else
+		{
+			Print_Msg("BL_DEBUG_MSG: Invalid target address\n");
+			Bootloader_UART_Write_Data(&addrInvalid, 1);
+		}
+	}
+	else
+	{
+		/* Checksum is not correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
+		
+		/* Send NACK */
+		Bootloader_Tx_NACK();
+	}
 }
 
 /**
@@ -912,6 +967,34 @@ uint8_t Get_Flash_RDP_Level(void)
 	
 	return rdpStatus;
 }
+
+/**
+ * @brief	Verifies the address sent by the host
+ * @param	addr - Address sent by the host that is to be verified
+ * @retval	ADDR_VALID if the passed addr is valid, ADDR_INVALID otherwise
+ * @note	What are the valid address to which the code can jump?
+ *			- System memory: YES
+*			- SRAM1: YES
+*			- SRAM2: YES
+*			- Backup SRAM: YES
+*			- Peripheral memory: NO (Possible, but will not allow)
+*			- External memory:	YES
+*/
+uint8_t Verify_Addr(uint32_t addr)
+{
+	if (SRAM1_BASE <= addr && addr <= SRAM1_END)
+		return ADDR_VALID;
+	else if (SRAM2_BASE <= addr && addr <= SRAM2_END)
+		return ADDR_VALID;
+	else if (FLASH_BASE <= addr && addr <= FLASH_END)
+		return ADDR_VALID;
+	else if (BKPSRAM_BASE <= addr && addr <= BKPSRAM_END)
+		return ADDR_VALID;
+	else
+		return ADDR_INVALID;
+}
+
+
 
 /* USER CODE END 4 */
 
