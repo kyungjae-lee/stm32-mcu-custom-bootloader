@@ -78,7 +78,7 @@ uint8_t Get_Bootloader_Version(void);
 uint16_t Get_MCU_Chip_ID(void);
 uint8_t Get_Flash_RDP_Level(void);
 uint8_t Verify_Addr(uint32_t addr);
-
+uint8_t Execute_Flash_Erase(uint8_t sectorNumber, uint8_t numberOfSectors);
 
 /* Bootloader function prototypes */
 void Bootloader_UART_Read_Data(void);
@@ -155,6 +155,10 @@ void Bootloader_Jump_To_User_App(void);
 
 /* USER CODE BEGIN Private defines */
 
+#define LD4_GPIO_PORT			GPIOD
+#define LD4_PIN					GPIO_PIN_12
+
+
 #define FLASH_SECTOR2_BASE_ADDRESS 0x08008000U
 
 /* Bootloader version */
@@ -183,6 +187,8 @@ void Bootloader_Jump_To_User_App(void);
 
 #define ADDR_VALID 				0
 #define ADDR_INVALID			1
+
+#define INVALID_NUM_OF_SECTORS	4
 
 /* Some start and end addresses of different memories of STM32F407xx MCU */
 #define SRAM1_SIZE				112 * 1024 						/* 112 KB */

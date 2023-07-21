@@ -47,6 +47,7 @@
 #define D_UART					&huart3		/* Debug USART */
 #define C_UART					&huart2		/* Virtual COM Port USART */
 #define BL_RX_LEN				200
+#define MAX_NUM_OF_SECTORS		12			/* STM32F407xx MCUs specific */
 
 /* USER CODE END PM */
 
@@ -547,14 +548,15 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-/* Implementation of the bootloader command handler functions */
+/* Implementation of the bootloader command handler functions ----------------*/
 
 /**
- * @brief	Handles BL_GET_VER command
- * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * @retval	None
- * @note	BL_GET_VER command is used to read the bootloader version from the 
- *  		MCU.
+ * Bootloader_GetVer_Cmd_Handler()
+ * Brief	: Handles BL_GET_VER command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_GET_VER command is used to read the bootloader version from the
+ *  		  MCU.
  */
 void Bootloader_GetVer_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
@@ -589,14 +591,15 @@ void Bootloader_GetVer_Cmd_Handler(uint8_t *pBLRxBuffer)
 		/* Send NACK */
 		Bootloader_Tx_NACK();
 	}
-}
+} /* End of Bootloader_GetVer_Cmd_Handler */
 
 /**
- * @brief	Handles BL_GET_HELP command
- * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * @retval	None
- * @note	BL_GET_HELP command is used to retrieve all the commands that are 
- * 			supported by the bootloader.
+ * Bootloader_GetHelp_Cmd_Handler()
+ * Brief	: Handles BL_GET_HELP command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_GET_HELP command is used to retrieve all the commands that are 
+ * 			  supported by the bootloader.
  */
 void Bootloader_GetHelp_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
@@ -627,16 +630,17 @@ void Bootloader_GetHelp_Cmd_Handler(uint8_t *pBLRxBuffer)
 		/* Send NACK */
 		Bootloader_Tx_NACK();
 	}
-}
+} /* End of Bootloader_GetHelp_Cmd_Handler */
 
 /**
- * @brief	Handles BL_GET_CID command
- * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * @retval	None
- * @note	BL_GET_CID command is used to read the MCU chip identification
- *			number.
- *			This function can be updated to read the Revision Identifier
- *			(REV_ID) as well.
+ * Bootloader_GetCID_Cmd_Handler()
+ * Brief	: Handles BL_GET_CID command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_GET_CID command is used to read the MCU chip identification
+ *			  number.
+ *			  This function can be updated to read the Revision Identifier
+ *			  (REV_ID) as well.
  */
 void Bootloader_GetCID_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
@@ -672,14 +676,15 @@ void Bootloader_GetCID_Cmd_Handler(uint8_t *pBLRxBuffer)
 		/* Send NACK */
 		Bootloader_Tx_NACK();
 	}
-}
+} /* End of Bootloader_GetCID_Cmd_Handler */
 
 /**
- * @brief	Handles BL_GET_RDP command
- * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * @retval	None
- * @note	BL_GET_RDP command is used to read the Flash Protection (RDP)
- *			Level.
+ * Bootloader_GetRDP_Cmd_Handler()
+ * Brief	: Handles BL_GET_RDP command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_GET_RDP command is used to read the Flash Protection (RDP)
+ *			  Level.
  */
 void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
@@ -714,22 +719,23 @@ void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBLRxBuffer)
 		/* Send NACK */
 		Bootloader_Tx_NACK();
 	}
-}
+} /* End of Bootloader_GetRDP_Cmd_Handler */
 
 /**
- * @brief	Handles BL_GO_TO_ADDR command
- * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * @retval	None
- * @note	BL_GO_TO_ADDR command is used to jump bootloader to specified 
- *			address.
- *			A good way to test this functionality is to set the target 
- *			address to the reset handler of the user application and see if
- *			the program successfully jumps to the user application. (Reset 
- *			handler is the entry point to the user application)
- *			When entering the target address to the host application, 
- *			make sure to account for the T-bit setting. For example, 
- *			If the address of the user application's reset handler is 
- *			0x08008229, then enter 0x08008228.
+ * Bootloader_GoToAddr_Cmd_Handler()
+ * Brief	: Handles BL_GO_TO_ADDR command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_GO_TO_ADDR command is used to jump bootloader to specified 
+ *			  address.
+ *			  A good way to test this functionality is to set the target 
+ *			  address to the reset handler of the user application and see if
+ *			  the program successfully jumps to the user application. (Reset 
+ *			  handler is the entry point to the user application)
+ *			  When entering the target address to the host application, 
+ *			  make sure to account for the T-bit setting. For example, 
+ *			  If the address of the user application's reset handler is 
+ *			  0x08008229, then enter 0x08008228.
  */
 void Bootloader_GoToAddr_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
@@ -788,81 +794,130 @@ void Bootloader_GoToAddr_Cmd_Handler(uint8_t *pBLRxBuffer)
 		/* Send NACK */
 		Bootloader_Tx_NACK();
 	}
-}
+} /* End of Bootloader_GoToAddr_Cmd_Handler */
 
 /**
- * @brief	Handles BL_ERASE_FLASH command
- * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * @retval	None
- * @note	BL_ERASE_FLASH command is used to mass erase or sector erase the user 
- *			Flash.
+ * Bootloader_EraseFlash_Cmd_Handler()
+ * Brief	: Handles BL_ERASE_FLASH command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_ERASE_FLASH command is used to mass-erase or sector-erase the
+ *			  user Flash. Erasing a byte of memory space means setting it to 0xFF.
+ *			  Check out the 'Erase and program operations' section of the MCU 
+ *			  reference manual for more details about sector-erase and mass-erase.
+ *			  This function will use Flash driver APIs to implement the erasing 
+ *			  functionality. (stn32f4xx_hal_flash_ex.c)
  */
 void Bootloader_EraseFlash_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
-}
+	uint8_t eraseStatus = 0x00;
+	Print_Msg("BL_DEBUG_MSG: Bootloader_EraseFlash_Cmd_Handler()\n");
+	
+	/* Total length of the command packet */
+	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
+	
+	/* Extract the CRC32 sent by the host */
+	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
+
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
+	{
+		/* Checksum is correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
+		
+		/* Send ACK */
+		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
+		Print_Msg("BL_DEBUG_MSG: Initial sector: %d, number of sectors: %d\n", pBLRxBuffer[2], pBLRxBuffer[3]);
+		
+		/* Configure an on-board LED to turn on when the erase operation begins,
+		 * and turn off when the operation ends.
+		 */
+		HAL_GPIO_WritePin(LD4_GPIO_PORT, LD4_Pin, 1);
+		eraseStatus = Execute_Flash_Erase(pBLRxBuffer[2], pBLRxBuffer[3]);
+		HAL_GPIO_WritePin(LD4_GPIO_PORT, LD4_Pin, 0);
+
+		Print_Msg("BL_DEBUG_MSG: Flash erase status: %#x\n", eraseStatus);
+		
+		/* Send response to the host */
+		Bootloader_UART_Write_Data(&eraseStatus, 1);
+	}
+	else
+	{
+		/* Checksum is not correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
+		
+		/* Send NACK */
+		Bootloader_Tx_NACK();
+	}
+} /* End of Bootloader_EraseFlash_Cmd_Handler */
 
 /**
- * @brief	Handles BL_WRITE_MEM command
- * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * @retval	None
- * @note	BL_WRITE_MEM command is used to write data into different memories of
- * 			the MCU.
+ * Bootloader_WriteMem_Cmd_Handler()
+ * Brief	: Handles BL_WRITE_MEM command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_WRITE_MEM command is used to write data into different memories
+ *			  of the MCU.
  */
 void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
-}
+} /* End of Bootloader_WriteMem_Cmd_Handler */
 
 /**
- * @brief	Handles BL_ENDIS_RW_PROTECT command
- * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * @retval	None
- * @note	BL_ENDIS_RW_PROTECT command is used to enable read/write protection on
- *			different sectors of the user Flash.
+ * Bootloader_EnDisRWProtect_Cmd_Handler()
+ * Brief	: Handles BL_ENDIS_RW_PROTECT command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_ENDIS_RW_PROTECT command is used to enable read/write protection on
+ *			  different sectors of the user Flash.
  */
 void Bootloader_EnDisRWProtect_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
-}
+} /* End of Bootloader_EnDisRWProtect_Cmd_Handler */
 
 /**
- * @brief	Handles BL_READ_MEM command
- * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * @retval	None
- * @note	BL_WRITE_MEM command is used to read data from different memories of
- * 			the MCU.
+ * Bootloader_ReadMem_Cmd_Handler()
+ * Brief	: Handles BL_READ_MEM command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_WRITE_MEM command is used to read data from different memories of
+ * 			  the MCU.
  */
 void Bootloader_ReadMem_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
-}
+} /* End of Bootloader_ReadMem_Cmd_Handler */
 
 /**
- * @brief	Handles BL_READ_PROTECT_STATUS command
- * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * @retval	None
- * @note	BL_READ_PROTECT_STATUS command is used to read the protection status
- *			of all the sectors of the user Flash memory.
+ * Bootloader_ReadProtectStatus_Cmd_Handler()
+ * Brief	: Handles BL_READ_PROTECT_STATUS command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_READ_PROTECT_STATUS command is used to read the protection status
+ *			  of all the sectors of the user Flash memory.
  */
 void Bootloader_ReadProtectStatus_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
-}
+} /* End of Bootloader_ReadProtectStatus_Cmd_Handler */
 
 /**
- * @brief	Handles BL_READ_OTP command
- * @param	pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * @retval	None
- * @note	BL_READ_OTP command is used to read the OTP contents
+ * Bootloader_ReadOTP_Cmd_Handler()
+ * Brief	: Handles BL_READ_OTP command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_READ_OTP command is used to read the OTP contents
  */
 void Bootloader_ReadOTP_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
-}
+} /* End of Bootloader_ReadOTP_Cmd_Handler */
 
 
-/* Implementation of the bootloader helper functions */
+/* Implementation of the bootloader helper functions -------------------------*/
 
 /**
- * @brief	Sends ACK message to the host
- * @param	cmdCode - Command code received from the host
- * @param	lenToFollow - Length of the subsequent data bytes
- * @retval	None
+ * Bootloader_Tx_ACK()
+ * Brief	: Sends ACK message to the host
+ * Param	: @cmdCode - Command code received from the host
+ *			: @lenToFollow - Length of the subsequent data bytes
+ * Retval	: None
  */
 void Bootloader_Tx_ACK(uint8_t cmdCode, uint8_t lenToFollow)
 {
@@ -871,26 +926,28 @@ void Bootloader_Tx_ACK(uint8_t cmdCode, uint8_t lenToFollow)
 	ackBuf[0] = BL_ACK;
 	ackBuf[1] = lenToFollow;
 	HAL_UART_Transmit(C_UART, ackBuf, 2, HAL_MAX_DELAY);
-}
+} /* End of Bootloader_Tx_ACK */
 
 /**
- * @brief	Sends NACK message to the host
- * @param	None
- * @retval	None
+ * Bootloader_Tx_NACK()
+ * Brief	: Sends NACK message to the host
+ * Param	: None
+ * Retval	: None
  */
 void Bootloader_Tx_NACK(void)
 {
 	/* NACKing incorporates 1 byte */
 	uint8_t nack = BL_NACK;
 	HAL_UART_Transmit(C_UART, &nack, 1, HAL_MAX_DELAY);
-}
+} /* End of Bootloader_Tx_NACK */
 
 /**
- * @brief	Verifies the CRC of the given buffer in data 
- * @param	data - Pointer to the data for which the CRC has to be calculated
- * @param	len - Length for which the CRC has to be calculated
- * @param	crc_host - 32-bit crc value sent by the host
- * @retval	0 if CRC verification was successful, 1 otherwise.
+ * Bootloader_Verify_CRC()
+ * Brief	: Verifies the CRC of the given buffer in data
+ * Param	: @pPacket - Pointer to the data for which the CRC has to be calculated
+ *			: @len - Length for which the CRC has to be calculated
+ *			: @crcHost - 32-bit crc value sent by the host
+ * Retval	: 0 if CRC verification was successful, 1 otherwise.
  */
 uint8_t Bootloader_Verify_CRC(uint8_t *pPacket, uint32_t len, uint32_t crcHost)
 {
@@ -912,51 +969,55 @@ uint8_t Bootloader_Verify_CRC(uint8_t *pPacket, uint32_t len, uint32_t crcHost)
 	}
 	
 	return CRC_VERIFICATION_FAIL;
-}
+} /* End of Bootloader_Verify_CRC */
 
 /**
- * @brief	Writes data to C_UART
- * @param	None
- * @retval	Bootloader version macro value
- * @note	This function is a wrapper function for 'HAL_UART_Transmit()'
+ * Bootloader_UART_Write_Data()
+ * Brief	: Writes data to C_UART
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ *			: @len - Length of data to write
+ * Retval	: None
+ * Note		: This function is a wrapper function for 'HAL_UART_Transmit()'
  */
 void Bootloader_UART_Write_Data(uint8_t *pBuffer, uint32_t len)
 {
 	HAL_UART_Transmit(C_UART, pBuffer, len, HAL_MAX_DELAY);
-}
+} /* End of Bootloader_UART_Write_Data */
 
 /**
- * @brief	Returns the bootloader version macro value
- * @param	None
- * @retval	Bootloader version macro value
- * @note	N/A
+ * Get_Bootloader_Version()
+ * Brief	: Returns the bootloader version macro value
+ * Param	: None
+ * Retval	: Bootloader version macro value
  */
 uint8_t Get_Bootloader_Version(void)
 {
 	return (uint8_t)BL_VERSION;
-}
+} /* End of Get_Bootloader_Version */
 
 /**
- * @brief	Returns the chip (or device) identifier
- * @param	None
- * @retval	16-bit MCU chip identification number
- * @note	For more information, see the "MCU device ID code" section of the
- *			MCU reference manual. (DBGMCU_IDCODE; Address: 0xE0042000)
- *			- Bit[31:16] - Revision identifier (REV_ID)
- *			- Bit[11:0] - Device identifier (DEV_ID) - 0x413
+ * Get_MCU_Chip_ID()
+ * Brief	: Returns the chip (or device) identifier
+ * Param	: None
+ * Retval	: 16-bit MCU chip identification number
+ * Note		: For more information, see the "MCU device ID code" section of the
+ *			  MCU reference manual. (DBGMCU_IDCODE; Address: 0xE0042000)
+ *			  - Bit[31:16] - Revision identifier (REV_ID)
+ *			  - Bit[11:0] - Device identifier (DEV_ID) - 0x413
  */
 uint16_t Get_MCU_Chip_ID(void)
 {
 	return (uint16_t)(DBGMCU->IDCODE) & 0x0FFF;
-}
+} /* End of Get_MCU_Chip_ID */
 
 /**
- * @brief	Returns the Flash memory RDP (Read Protection) level
- * @param	None
- * @retval	8-bit RDP level
- * @note	For more information, see the "Option Bytes" section of the MCU
- *			reference manual.
- *			Additional functions can be defined to handle RDP level change.
+ * Get_Flash_RDP_Level()
+ * Brief	: Returns the Flash memory RDP (Read Protection) level
+ * Param	: None
+ * Retval	: 8-bit RDP level
+ * Note		: For more information, see the "Option Bytes" section of the MCU
+ *			  reference manual.
+ *			  Additional functions can be defined to handle RDP level change.
  */
 uint8_t Get_Flash_RDP_Level(void)
 {
@@ -974,20 +1035,21 @@ uint8_t Get_Flash_RDP_Level(void)
 #endif
 	
 	return rdpStatus;
-}
+} /* End of Get_Flash_RDP_Level */
 
 /**
- * @brief	Verifies the address sent by the host
- * @param	addr - Address sent by the host that is to be verified
- * @retval	ADDR_VALID if the passed addr is valid, ADDR_INVALID otherwise
- * @note	What are the valid address to which the code can jump?
- *			- System memory: YES
-*			- SRAM1: YES
-*			- SRAM2: YES
-*			- Backup SRAM: YES
-*			- Peripheral memory: NO (Possible, but will not allow)
-*			- External memory:	YES
-*/
+ * Verify_Addr()
+ * Brief	: Verifies the address sent by the host
+ * Param	: @addr - Address sent by the host that is to be verified
+ * Retval	: ADDR_VALID if the passed addr is valid, ADDR_INVALID otherwise
+ * Note		: What are the valid address to which the code can jump?
+ *			  - System memory: YES
+ *			  - SRAM1: YES
+ *			  - SRAM2: YES
+ *			  - Backup SRAM: YES
+ *			  - Peripheral memory: NO (Possible, but will not allow)
+ *			  - External memory:	YES
+ */
 uint8_t Verify_Addr(uint32_t addr)
 {
 	if (SRAM1_BASE <= addr && addr <= SRAM1_END)
@@ -1000,8 +1062,73 @@ uint8_t Verify_Addr(uint32_t addr)
 		return ADDR_VALID;
 	else
 		return ADDR_INVALID;
-}
+} /* End of Verify_Addr */
 
+/**
+ * Execute_Flash_Erase()
+ * Brief	: Performs Flash erase as per the passed arguments
+ * Param	: @sectorNumber - The sector number (0-11) to erase or 0xFF to mass-
+ *			  erase
+ *			  @numberOfSectors - The number of sectors to erase 
+ * Retval	: 0x00 (HAL_OK) if the erase was successful
+ *			  0x01 (HAL_ERROR) if the erase was unsuccessful due to error
+ *			  0x02 (HAL_BUSY) if the erase was unsuccessful due to busy state
+ *			  0x03 (HAL_TIMEOUT) if the erase was unsuccessful due to timeout
+ *			  0x04 (INVALID_NUM_OF_SECTORS) if the entered number of sectors to
+ *				   erase was invalid
+ * Note		: Main memory of the Flash module of the STM32F407xx MCUs consists
+ *			  of 12 sectors (0-11). Therefore, @numberOfSectors should be in the
+ *			  range of 1-12.
+ *			  @sectorNumber 0xFF means 'mass-erase'.
+ */
+uint8_t Execute_Flash_Erase(uint8_t sectorNumber, uint8_t numberOfSectors)
+{
+	FLASH_EraseInitTypeDef flashEraseHandle;
+	uint32_t sectorError;
+	HAL_StatusTypeDef status;
+	
+	if (numberOfSectors > MAX_NUM_OF_SECTORS)
+		return INVALID_NUM_OF_SECTORS;
+	
+	if ((sectorNumber == 0xFF) || (sectorNumber < MAX_NUM_OF_SECTORS))
+	{
+		if (sectorNumber == (uint8_t)0xFF)
+		{
+			/* Perform mass-erase */
+			flashEraseHandle.TypeErase = FLASH_TYPEERASE_MASSERASE;
+		}
+		else
+		{
+			/* Perform sector-erase */
+			
+			/* Calculate how many sectors need to be erased */
+			uint8_t remainingSectors = MAX_NUM_OF_SECTORS - sectorNumber;
+			if (numberOfSectors > remainingSectors)
+			{
+				numberOfSectors = remainingSectors;
+			}
+			
+			/* Populate the flashEraseHandle structure */
+			flashEraseHandle.TypeErase = FLASH_TYPEERASE_SECTORS;
+			flashEraseHandle.Sector = sectorNumber;	/* Initial sector */
+			flashEraseHandle.NbSectors = numberOfSectors;
+		}
+		
+		flashEraseHandle.Banks = FLASH_BANK_1;
+		
+		/* In order to access the Flash registers, unlock the flash first.
+		 * ('Unlocking the Flash control register' of the MCU reference manual) 
+		 */
+		HAL_FLASH_Unlock();
+		flashEraseHandle.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+		status = (uint8_t)HAL_FLASHEx_Erase(&flashEraseHandle, &sectorError);
+		HAL_FLASH_Lock();
+		
+		return status;
+	}
+	
+	return INVALID_NUM_OF_SECTORS;
+} /* End of Execute_Flash_Erase */
 
 
 /* USER CODE END 4 */
