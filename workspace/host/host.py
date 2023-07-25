@@ -45,12 +45,12 @@ mem_write_active =0
 #----------------------------- file ops----------------------------------------
 
 def calc_file_len():
-    size = os.path.getsize("user_app.bin")
+    size = os.path.getsize("stm32f407xx_user_application.bin")
     return size
 
 def open_the_file():
     global bin_file
-    bin_file = open('user_app.bin','rb')
+    bin_file = open('stm32f407xx_user_application.bin','rb')
     #read = bin_file.read()
     #global file_contents = bytearray(read)
 
@@ -505,7 +505,7 @@ def decode_menu_command_code(command):
     
     elif(command == 9):
         print("\n   Command == > BL_EN_R_W_PROTECT")
-        total_sector = int(input("\n   How many sectors do you want to protect ?: "))
+        total_sector = int(input("\n   How many sectors do you want to write protect ?: "))
         sector_numbers = [0,0,0,0,0,0,0,0]
         sector_details=0
         for x in range(total_sector):
@@ -513,11 +513,12 @@ def decode_menu_command_code(command):
             sector_details = sector_details | (1 << sector_numbers[x])
 
         #print("Sector details",sector_details)
-        print("\n   Mode:Flash sectors Write Protection: 1")
-        print("\n   Mode:Flash sectors Read/Write Protection: 2")
-        mode=input("\n   Enter Sector Protection Mode(1 or 2 ):")
+        print("\n   Read Protection Level 0: 0 - No read protection");
+        print("\n   Read Protection Level 1: 1 - Memory read protection");
+        print("\n   Read Protection Level 0: 0 - Chip read protection (Be careful!)");
+        mode=input("\n   Enter Read protection level(0/1/2 ):")
         mode = int(mode)
-        if(mode != 2 and mode != 1):
+        if(mode != 2 and mode != 1 and mode != 0):
             printf("\n   Invalid option : Command Dropped")
             return
         if(mode == 2):
