@@ -49,6 +49,9 @@
 #define BL_RX_LEN				200
 #define MAX_NUM_OF_SECTORS		12			/* STM32F407xx MCUs specific */
 
+/* Flash option control register */
+#define FLASH_OPTCR				(*(uint32_t volatile *)0x40023C14)
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -66,11 +69,16 @@ uint8_t supportedCmds[] = {
 	BL_GET_VER,
 	BL_GET_HELP,
 	BL_GET_CID,
-	BL_GET_RDP_STATUS,
+	BL_GET_RDP_LEVEL,
+	BL_SET_RDP_LEVEL,
 	BL_GO_TO_ADDR,
 	BL_ERASE_FLASH,
 	BL_WRITE_MEM,
-	BL_READ_PROTECT_STATUS
+	BL_READ_MEM,
+	BL_ENABLE_WRP,
+	BL_DISABLE_WRP,
+	BL_GET_WRP_STATUS,
+	BL_READ_OTP,
 };
 	
 
@@ -182,8 +190,11 @@ void Bootloader_UART_Read_Data(void)
 			case BL_GET_CID:
 				Bootloader_GetCID_Cmd_Handler(blRxBuffer);
 				break;
-			case BL_GET_RDP_STATUS:
-				Bootloader_GetRDP_Cmd_Handler(blRxBuffer);
+			case BL_GET_RDP_LEVEL:
+				Bootloader_GetRDPLevel_Cmd_Handler(blRxBuffer);
+				break;
+			case BL_SET_RDP_LEVEL:
+				Bootloader_GetRDPLevel_Cmd_Handler(blRxBuffer);
 				break;
 			case BL_GO_TO_ADDR:
 				Bootloader_GoToAddr_Cmd_Handler(blRxBuffer);
@@ -194,14 +205,17 @@ void Bootloader_UART_Read_Data(void)
 			case BL_WRITE_MEM:
 				Bootloader_WriteMem_Cmd_Handler(blRxBuffer);
 				break;
-			case BL_ENDIS_RW_PROTECT:
-				Bootloader_EnDisRWProtect_Cmd_Handler(blRxBuffer);
-				break;
 			case BL_READ_MEM:
 				Bootloader_ReadMem_Cmd_Handler(blRxBuffer);
 				break;
-			case BL_READ_PROTECT_STATUS:
-				Bootloader_ReadProtectStatus_Cmd_Handler(blRxBuffer);
+			case BL_ENABLE_WRP:
+				Bootloader_EnableWRP_Cmd_Handler(blRxBuffer);
+				break;
+			case BL_DISABLE_WRP:
+				Bootloader_DisableWRP_Cmd_Handler(blRxBuffer);
+				break;
+			case BL_GET_WRP_STATUS:
+				Bootloader_GetWRPStatus_Cmd_Handler(blRxBuffer);
 				break;
 			case BL_READ_OTP:
 				Bootloader_ReadOTP_Cmd_Handler(blRxBuffer);
@@ -679,17 +693,17 @@ void Bootloader_GetCID_Cmd_Handler(uint8_t *pBLRxBuffer)
 } /* End of Bootloader_GetCID_Cmd_Handler */
 
 /**
- * Bootloader_GetRDP_Cmd_Handler()
- * Brief	: Handles BL_GET_RDP command
+ * Bootloader_GetRDPLevel_Cmd_Handler()
+ * Brief	: Handles BL_GET_RDP_LEVEL command
  * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
  * Retval	: None
- * Note		: BL_GET_RDP command is used to read the Flash Protection (RDP)
- *			  Level.
+ * Note		: BL_GET_RDP_LEVEL command is used to read the Flash Read Protection
+ *            (RDP) level.
  */
-void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBLRxBuffer)
+void Bootloader_GetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 	uint8_t rdpLevel = 0x00;
-	Print_Msg("BL_DEBUG_MSG: Bootloader_GetRDP_Cmd_Handler()\n");
+	Print_Msg("BL_DEBUG_MSG: Bootloader_GetRDPLevel_Cmd_Handler()\n");
 
 	/* Total length of the command packet */
 	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
@@ -719,7 +733,58 @@ void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBLRxBuffer)
 		/* Send NACK */
 		Bootloader_Tx_NACK();
 	}
-} /* End of Bootloader_GetRDP_Cmd_Handler */
+} /* End of Bootloader_GetRDPLevel_Cmd_Handler */
+
+/**
+ * Bootloader_SetRDPLevel_Cmd_Handler()
+ * Brief	: Handles BL_SET_RDP_LEVEL command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_SET_RDP_LEVEL command is used to set the Flash Read Protection
+ *            (RDP) level.
+ *			  - When Level 2 is activated, the Level of protection cannot be 
+ *				degraded to Level 1 or Level 0. This is an irreversible operation.
+ *			  - Switching to Level 2 should only be done during the production
+ *				phase to impose some restrictions before handing the product to
+ *				the customer so that they cannot access or modify the production
+ *				code.
+ *			  - During the development phase, DO NOT change the RDP status to Level 2!
+ */
+void Bootloader_SetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer)
+{
+	uint8_t rdpLevel;
+	Print_Msg("BL_DEBUG_MSG: Bootloader_SetRDPLevel_Cmd_Handler()\n");
+
+	/* Total length of the command packet */
+	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
+	
+	/* Extract the CRC32 sent by the host */
+	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
+
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
+	{
+		/* Checksum is correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
+		
+		/* Send ACK */
+		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
+		
+		rdpLevel = pBLRxBuffer[2];
+		Set_Flash_RDP_Level(rdpLevel);
+		Print_Msg("BL_DEBUG_MSG: RDP level: %d %#x\n", rdpLevel, rdpLevel);
+		
+		/* Send response to the host */
+		Bootloader_UART_Write_Data(&rdpLevel, 1);
+	}
+	else
+	{
+		/* Checksum is not correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
+		
+		/* Send NACK */
+		Bootloader_Tx_NACK();
+	}
+} /* End of Bootloader_SetRDPLevel_Cmd_Handler */
 
 /**
  * Bootloader_GoToAddr_Cmd_Handler()
@@ -857,22 +922,167 @@ void Bootloader_EraseFlash_Cmd_Handler(uint8_t *pBLRxBuffer)
  * Retval	: None
  * Note		: BL_WRITE_MEM command is used to write data into different memories
  *			  of the MCU.
+ *			  BL_WRITE_MEM command can handle writing maximum 255 bytes at once.
+ *			  The host application will use this command repeatedly to write all
+ *			  required data to the specified memory.
+ *			  The bootloader then will write the contents of the 'payload' field
+ *			  of the packet frame to the memory specified by the 'base memory 
+ *			  address' field.
  */
 void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
+	uint8_t addrValid = ADDR_VALID;
+	uint8_t writeStatus = 0x00;
+	uint8_t checksum = 0, len = 0;
+	len = pBLRxBuffer[0];
+	uint8_t payloadLen = pBLRxBuffer[6];
+	
+	uint32_t memAddr = *((uint32_t *)&pBLRxBuffer[2]);
+	
+	checksum = pBLRxBuffer[len];
+	
+	Print_Msg("BL_DEBUG_MSG: Bootloader_WriteMem_Cmd_Handler()\n");
+
+	/* Total length of the command packet */
+	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
+	
+	/* Extract the CRC32 sent by the host */
+	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
+
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
+	{
+		/* Checksum is correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
+		
+		/* Send ACK */
+		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
+		
+		Print_Msg("BL_DEBUG_MSG: Memory address to write to: %#x\n", memAddr);
+		
+		if (Verify_Addr(memAddr) == ADDR_VALID)
+		{
+			Print_Msg("BL_DEBUG_MSG: Valid address for write\n");
+			
+			/* Turn on the LED to indicate that the bootloader's write operation is on */
+			HAL_GPIO_WritePin(LD4_GPIO_PORT, LD4_PIN, GPIO_PIN_SET);
+			/* Execute memory write */
+			writeStatus = Execute_MEMORY_Write(&pBLRxBuffer[7], memAddr, payloadLen);
+			
+			/* Turn off the LED to indicate that the bootloader's write operation is over */
+			HAL_GPIO_WritePin(LD4_GPIO_PORT, LD4_PIN, GPIO_PIN_RESET);
+			
+			/* Send response to the host */
+			Bootloader_UART_Write_Data(&writeStatus, 1);
+		}
+		else
+		{
+			Print_Msg("BL_DEBUG_MSG: Invalid address for memory write\n");
+			writeStatus = ADDR_INVALID;
+			
+			/* Send response to the host */
+			Bootloader_UART_Write_Data(&writeStatus, 1);
+		}
+	}
+	else
+	{
+		/* Checksum is not correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
+		
+		/* Send NACK */
+		Bootloader_Tx_NACK();
+	}
 } /* End of Bootloader_WriteMem_Cmd_Handler */
 
 /**
- * Bootloader_EnDisRWProtect_Cmd_Handler()
- * Brief	: Handles BL_ENDIS_RW_PROTECT command
+ * Bootloader_EnableWRP_Cmd_Handler()
+ * Brief	: Handles BL_ENABLE_WRP command
  * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
  * Retval	: None
- * Note		: BL_ENDIS_RW_PROTECT command is used to enable read/write protection on
- *			  different sectors of the user Flash.
+ * Note		: BL_ENABLE_WRP command is used to enable the Write Protection (WRP)
+ *			  for the selected sectors of the user Flash memory.
  */
-void Bootloader_EnDisRWProtect_Cmd_Handler(uint8_t *pBLRxBuffer)
+void Bootloader_EnableWRP_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
-} /* End of Bootloader_EnDisRWProtect_Cmd_Handler */
+	uint8_t status = 0x00;
+	
+	Print_Msg("BL_DEBUG_MSG: Bootloader_EnableWRP_Cmd_Handler()\n");
+	
+	/* Total length of the command packet */
+	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
+	
+	/* Extract the CRC32 sent by the host */
+	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
+
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
+	{
+		/* Checksum is correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
+		
+		/* Send ACK */
+		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
+		
+		status = Configure_Flash_WRP(pBLRxBuffer[2], 0);
+		
+		Print_Msg("BL_DEBUG_MSG: Write protection enable status: %#x\n", status);
+		
+		/* Send response to the host */
+		Bootloader_UART_Write_Data(&status, 1);
+	}
+	else
+	{
+		/* Checksum is not correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
+		
+		/* Send NACK */
+		Bootloader_Tx_NACK();
+	}
+} /* End of Bootloader_EnableWRP_Cmd_Handler */
+
+/**
+ * Bootloader_DisableWRP_Cmd_Handler()
+ * Brief	: Handles BL_DISABLE_WRP command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_DISABLE_WRP command is used to disable the Write Protection (WRP)
+ *			  for all the sectors of the user Flash (i.e., Restores the default
+ *			  protection state)
+ */
+void Bootloader_DisableWRP_Cmd_Handler(uint8_t *pBLRxBuffer)
+{
+	uint8_t status = 0x00;
+	
+	Print_Msg("BL_DEBUG_MSG: Bootloader_DisableWRP_Cmd_Handler()\n");
+	
+	/* Total length of the command packet */
+	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
+	
+	/* Extract the CRC32 sent by the host */
+	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
+
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
+	{
+		/* Checksum is correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
+		
+		/* Send ACK */
+		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
+		
+		status = Configure_Flash_WRP(0, 1);
+		
+		Print_Msg("BL_DEBUG_MSG: Write protection disable status: %#x\n", status);
+		
+		/* Send response to the host */
+		Bootloader_UART_Write_Data(&status, 1);
+	}
+	else
+	{
+		/* Checksum is not correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
+		
+		/* Send NACK */
+		Bootloader_Tx_NACK();
+	}
+} /* End of Bootloader_DisableWRP_Cmd_Handler */
 
 /**
  * Bootloader_ReadMem_Cmd_Handler()
@@ -887,15 +1097,49 @@ void Bootloader_ReadMem_Cmd_Handler(uint8_t *pBLRxBuffer)
 } /* End of Bootloader_ReadMem_Cmd_Handler */
 
 /**
- * Bootloader_ReadProtectStatus_Cmd_Handler()
- * Brief	: Handles BL_READ_PROTECT_STATUS command
+ * Bootloader_GetWRPStatus_Cmd_Handler()
+ * Brief	: Handles BL_GET_WRP_STATUS command
  * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
  * Retval	: None
- * Note		: BL_READ_PROTECT_STATUS command is used to read the protection status
- *			  of all the sectors of the user Flash memory.
+ * Note		: BL_GET_WRP_STATUS command is used to read the read/write 
+ *			  protection status of all the sectors of the user Flash memory.
  */
-void Bootloader_ReadProtectStatus_Cmd_Handler(uint8_t *pBLRxBuffer)
+void Bootloader_GetWRPStatus_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
+	uint16_t status;
+	
+	Print_Msg("BL_DEBUG_MSG: Bootloader_DisableRWProtect_Cmd_Handler()\n");
+	
+	/* Total length of the command packet */
+	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
+	
+	/* Extract the CRC32 sent by the host */
+	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
+
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
+	{
+		/* Checksum is correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
+		
+		/* Send ACK */
+		Bootloader_Tx_ACK(pBLRxBuffer[0], 2);
+		
+		//status = Read_OB_nWRP_RDP_Status();	/* TODO */
+		
+		Print_Msg("BL_DEBUG_MSG: nWRP: %#x, RDP: %#x\n", status >> 16, (status & 0xFFFF) >> 8);
+		
+		/* Send response to the host */
+		//Bootloader_UART_Write_Data(&status, 1); /* TODO */
+	}
+	else
+	{
+		/* Checksum is not correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
+		
+		/* Send NACK */
+		Bootloader_Tx_NACK();
+	}
+
 } /* End of Bootloader_ReadProtectStatus_Cmd_Handler */
 
 /**
@@ -1038,6 +1282,61 @@ uint8_t Get_Flash_RDP_Level(void)
 } /* End of Get_Flash_RDP_Level */
 
 /**
+ * Set_Flash_RDP_Level()
+ * Brief	: Modifies the user option bytes
+ * Param	: @rdpLevel - Read Protection (RDP) level; 0, 1, or 2
+ *			  to the default status otherwise
+ * Retval	: 8-bit satus value; 0
+ * Note		: To modify the user option value, follow the following sequence:
+ *			  1. Check that no Flash memory operation is ongoing by checking the
+ *				 BSY bit in the FLASH_SR register
+ *			  2. Write the desired option value in the FLASH_OPTCR register
+ *			  3. Set the option start bit (OPTSTRT) in the FLASH_OPTCR register
+ *			  4. Wait for the BSY bit to be cleared
+ *			  Please see the reference manual for more details.
+ *			  This function is used by both 'Bootloader_SetRDPLevel_Cmd_Handler()'.
+ */
+uint8_t Set_Flash_RDP_Level(uint8_t rdpLevel)
+{
+	/* Configure read protection level according to @rdpLevel ----------------*/
+		 
+	/* Option byte configuration unlock */
+	HAL_FLASH_OB_Unlock();
+	
+	/* Wait till there's no active operation on Flash */
+	while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);		
+		
+	/* Clear bits[8:15] of FLASH_OPTCR before writing */
+	FLASH_OPTCR &= ~(0xFF << 8);
+
+	if (rdpLevel == 0)
+	{
+		/* Read protection level 0: Configure bits[8:15] of FLASH_OPTCR to 0xAA */
+		FLASH_OPTCR |= (RDP_LEVEL0 << 8);
+	}
+	else if (rdpLevel == 1)
+	{
+		/* Read protection level 1: Configure bits[8:15] of FLASH_OPTCR to 0x00 */
+		FLASH_OPTCR |= (RDP_LEVEL1 << 8);
+	}
+	else
+	{
+		/* Read protection level 1: Configure bits[8:15] of FLASH_OPTCR to 0xCC */
+		FLASH_OPTCR |= (RDP_LEVEL2 << 8);
+	}
+	
+	/* Set the option start bit (OPTSTRT) in the FLASH_OPTCR register */
+	FLASH_OPTCR |= (0x1 << 1);
+	
+	/* Wait till there's no active operation on Flash */
+	while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+	
+	HAL_FLASH_OB_Lock();
+	
+	return 0;
+} /* End of Set_Flash_RDP_Level */
+
+/**
  * Verify_Addr()
  * Brief	: Verifies the address sent by the host
  * Param	: @addr - Address sent by the host that is to be verified
@@ -1130,8 +1429,113 @@ uint8_t Execute_Flash_Erase(uint8_t sectorNumber, uint8_t numberOfSectors)
 	return INVALID_NUM_OF_SECTORS;
 } /* End of Execute_Flash_Erase */
 
+/**
+ * Execute_MEMORY_Write()
+ * Brief	: Writes the contents of @pBuffer byte-by-byte to @memAddr
+ * Param	: @pBuffer - Pointer to a buffer that contains data to write to 
+ *			  memory
+ *			  @memAddr - Memory address to write to 
+ *			  @len - byte-length of the data to write
+ * Retval	: HAL_OK		= 0x00U,
+ *			  HAL_ERROR		= 0x01U,
+ * 			  HAL_BUSY		= 0x02U,
+ *			  HAL_TIMEOUT  	= 0x03U
+ * Note		: Current implementation supports writing to Flash only.
+ *			  This function does not check whether 'memAddr' is valid address of
+ *			  the Flash range.
+ *			  The API 'HAL_FLASH_Program' performs the Flash memory programming
+ *			  according to the 'Flash memory programming sequence' described in
+ *			  the 'Programming - Standard programming' section of the MCU
+ *			  reference manual.
+*/
+uint8_t Execute_MEMORY_Write(uint8_t *pBuffer, uint32_t memAddr, uint32_t len)
+{
+	uint8_t status = HAL_OK;
+	
+	/* In order to access the Flash registers, unlock the flash first.
+	 * ('Unlocking the Flash control register' of the MCU reference manual) 
+	 */
+	HAL_FLASH_Unlock();/* USER CODE END 4 */
+	
+	for (uint32_t i = 0; i < len; i++)
+	{
+		/* Program the Flash byte-by-byte */
+		status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, memAddr + i, pBuffer[i]);
+	}
+	
+	HAL_FLASH_Lock();
+	
+	return status;
+} /* End of Execute_MEMORY_Write */
 
-/* USER CODE END 4 */
+/**
+ * Configure_Flash_WRP()
+ * Brief	: Modifies the user option bytes
+ * Param	: @nwrp - Sector not write protect value
+ *			  @disable - Allows configuring WRP status when 0, resets WRP back
+ *			  to the default status otherwise
+ * Retval	: 8-bit satus value; 0
+ * Note		: To modify the user option value, follow the following sequence:
+ *			  1. Check that no Flash memory operation is ongoing by checking the
+ *				 BSY bit in the FLASH_SR register
+ *			  2. Write the desired option value in the FLASH_OPTCR register
+ *			  3. Set the option start bit (OPTSTRT) in the FLASH_OPTCR register
+ *			  4. Wait for the BSY bit to be cleared
+ *			  Please see the reference manual for more details.
+ *			  This function is used by both 
+ *			  'Bootloader_EnableWRP_Cmd_Handler()', and
+ *			  'Bootloader_DisableWRP_Cmd_Handler()'
+ */
+uint8_t Configure_Flash_WRP(uint8_t nwrp, uint8_t disable)
+{
+	if (disable)
+	{
+		/* Disable read/write protection on all the sectors of the user Flash 
+		 * (i.e., Restores the default protection state)
+		 */
+		
+		/* Option byte configuration unlock */
+		HAL_FLASH_OB_Unlock();
+		
+		/* Wait till there's no active operation on Flash */
+		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+		
+		/* Clear the protection; set all sector bits[27:16] (nWRPi) to 1 */
+		FLASH_OPTCR |= (0xFFF << 16);
+		
+		/* Set the option start bit (OPTSTRT) in the FLASH_OPTCR register */
+		FLASH_OPTCR |= (0x1 << 1);
+		
+		/* Wait till there's no active operation on Flash */
+		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+		
+		HAL_FLASH_OB_Lock();
+		
+		return 0;
+	}
+
+	/* Configure write protection on the sectors encoded in @nwrp ------------*/
+
+	/* Option byte configuration unlock */
+	HAL_FLASH_OB_Unlock();
+	
+	/* Wait till there's no active operation on Flash */
+	while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);		
+	
+	/* Set write protection on the sectors encoded in @sectorDetails */
+	FLASH_OPTCR &= ~(nwrp << 16);
+		
+	/* Set the option start bit (OPTSTRT) in the FLASH_OPTCR register */
+	FLASH_OPTCR |= (0x1 << 1);
+	
+	/* Wait till there's no active operation on Flash */
+	while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+	
+	HAL_FLASH_OB_Lock();
+	
+	return 0;
+} /* End of Configure_Flash_WRP */
+
 
 /**
   * @brief  This function is executed in case of error occurrence.

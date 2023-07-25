@@ -60,13 +60,15 @@ void Error_Handler(void);
 void Bootloader_GetVer_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_GetHelp_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_GetCID_Cmd_Handler(uint8_t *pBLRxBuffer);
-void Bootloader_GetRDP_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_GetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_SetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer);	// TODO
 void Bootloader_GoToAddr_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_EraseFlash_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBLRxBuffer);
-void Bootloader_EnDisRWProtect_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_ReadMem_Cmd_Handler(uint8_t *pBLRxBuffer);
-void Bootloader_ReadProtectStatus_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_DisableWRP_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_EnableWRP_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_GetWRPStatus_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_ReadOTP_Cmd_Handler(uint8_t *pBLRxBuffer);
 
 /* Bootloader helper functions */
@@ -77,8 +79,11 @@ void Bootloader_UART_Write_Data(uint8_t *pBuffer, uint32_t len);
 uint8_t Get_Bootloader_Version(void);
 uint16_t Get_MCU_Chip_ID(void);
 uint8_t Get_Flash_RDP_Level(void);
+uint8_t Set_Flash_RDP_Level(uint8_t rdpLevel);
 uint8_t Verify_Addr(uint32_t addr);
 uint8_t Execute_Flash_Erase(uint8_t sectorNumber, uint8_t numberOfSectors);
+uint8_t Execute_MEMORY_Write(uint8_t *pBuffer, uint32_t memAddr, uint32_t len);
+uint8_t Configure_Flash_WRP(uint8_t nwrp, uint8_t disable);
 
 /* Bootloader function prototypes */
 void Bootloader_UART_Read_Data(void);
@@ -168,14 +173,17 @@ void Bootloader_Jump_To_User_App(void);
 #define BL_GET_VER				0x51
 #define BL_GET_HELP				0x52
 #define BL_GET_CID				0x53
-#define BL_GET_RDP_STATUS		0x54
+#define BL_GET_RDP_LEVEL		0x54
+#define BL_SET_RDP_LEVEL		0x5D
 #define BL_GO_TO_ADDR			0x55
 #define BL_ERASE_FLASH			0x56
 #define BL_WRITE_MEM			0x57
-#define BL_ENDIS_RW_PROTECT		0x58
 #define BL_READ_MEM				0x59
-#define	BL_READ_PROTECT_STATUS	0x5A
+#define BL_ENABLE_WRP			0x58
+#define BL_DISABLE_WRP			0x5C
+#define	BL_GET_WRP_STATUS		0x5A
 #define BL_READ_OTP				0x5B
+
 
 /* Bootloader ACK and NACK bytes */
 #define BL_ACK					0xA5
@@ -199,6 +207,10 @@ void Bootloader_Jump_To_User_App(void);
 #define BKPSRAM_SIZE			4 * 1024						/* 4 KB */
 #define BKPSRAM_END				(BKPSRAM_BASE + BKPSRAM_SIZE)
 
+/* Read protection levels */
+#define RDP_LEVEL0				0xAA
+#define RDP_LEVEL1				0x00	/* Can be any value other than 0xAA, 0xCC */
+#define RDP_LEVEL2				0xCC
 
 /* USER CODE END Private defines */
 
