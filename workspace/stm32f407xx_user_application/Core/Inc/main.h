@@ -127,6 +127,9 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
+#define LD3_GPIO_PORT			GPIOD
+#define LD3_PIN					GPIO_PIN_13
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

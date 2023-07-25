@@ -98,9 +98,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		HAL_UART_Transmit(&huart2, (uint8_t *)data, sizeof(data), HAL_MAX_DELAY);
-		uint32_t current_tick = HAL_GetTick();
-		while (HAL_GetTick() <= current_tick + 1000);
+	HAL_GPIO_TogglePin(LD3_GPIO_PORT, LD3_PIN);
+	HAL_UART_Transmit(&huart2, (uint8_t *)data, sizeof(data), HAL_MAX_DELAY);
+	uint32_t current_tick = HAL_GetTick();
+	while (HAL_GetTick() <= current_tick + 1000);
 		
     /* USER CODE END WHILE */
 
