@@ -4,39 +4,40 @@ import os
 import sys
 import glob
 
-Flash_HAL_OK                                        = 0x00
-Flash_HAL_ERROR                                     = 0x01
-Flash_HAL_BUSY                                      = 0x02
-Flash_HAL_TIMEOUT                                   = 0x03
-Flash_HAL_INV_ADDR                                  = 0x04
+Flash_HAL_OK                        = 0x00
+Flash_HAL_ERROR                     = 0x01
+Flash_HAL_BUSY                      = 0x02
+Flash_HAL_TIMEOUT                   = 0x03
+Flash_HAL_INV_ADDR                  = 0x04
 
 #BL Commands
-COMMAND_BL_GET_VER                                  = 0x51
-COMMAND_BL_GET_HELP                                 = 0x52
-COMMAND_BL_GET_CID                                  =0x53
-COMMAND_BL_GET_RDP_STATUS                           =0x54
-COMMAND_BL_GO_TO_ADDR                               =0x55
-COMMAND_BL_FLASH_ERASE                              =0x56
-COMMAND_BL_MEM_WRITE                                =0x57
-COMMAND_BL_EN_R_W_PROTECT                           =0x58
-COMMAND_BL_MEM_READ                                 =0x59
-COMMAND_BL_READ_SECTOR_P_STATUS                     =0x5A
-COMMAND_BL_OTP_READ                                 =0x5B
-COMMAND_BL_DIS_R_W_PROTECT                          =0x5C
-COMMAND_BL_MY_NEW_COMMAND                           =0x5D
+COMMAND_BL_GET_VER                  = 0x51
+COMMAND_BL_GET_HELP                 = 0x52
+COMMAND_BL_GET_CID                  = 0x53
+COMMAND_BL_GO_TO_ADDR               = 0x55
+COMMAND_BL_FLASH_ERASE              = 0x56
+COMMAND_BL_MEM_READ                 = 0x59
+COMMAND_BL_MEM_WRITE                = 0x57
+COMMAND_BL_GET_RDP_STATUS           = 0x54
+#SET_RDP_LEVEL
+COMMAND_BL_EN_R_W_PROTECT           = 0x58
+COMMAND_BL_DIS_R_W_PROTECT          = 0x5C
+COMMAND_BL_READ_SECTOR_P_STATUS     = 0x5A
+COMMAND_BL_OTP_READ                 = 0x5B
+COMMAND_BL_MY_NEW_COMMAND           = 0x5D
 
 #len details of the command
-COMMAND_BL_GET_VER_LEN                              =6
-COMMAND_BL_GET_HELP_LEN                             =6
-COMMAND_BL_GET_CID_LEN                              =6
-COMMAND_BL_GET_RDP_STATUS_LEN                       =6
-COMMAND_BL_GO_TO_ADDR_LEN                           =10
-COMMAND_BL_FLASH_ERASE_LEN                          =8
-COMMAND_BL_MEM_WRITE_LEN                            = 11
-COMMAND_BL_EN_R_W_PROTECT_LEN                       =8
-COMMAND_BL_READ_SECTOR_P_STATUS_LEN                 =6
-COMMAND_BL_DIS_R_W_PROTECT_LEN                      =6
-COMMAND_BL_MY_NEW_COMMAND_LEN                       =8
+COMMAND_BL_GET_VER_LEN              = 6
+COMMAND_BL_GET_HELP_LEN             = 6
+COMMAND_BL_GET_CID_LEN              = 6
+COMMAND_BL_GET_RDP_STATUS_LEN       = 6
+COMMAND_BL_GO_TO_ADDR_LEN           = 10
+COMMAND_BL_FLASH_ERASE_LEN          = 8
+COMMAND_BL_MEM_WRITE_LEN            = 11
+COMMAND_BL_EN_R_W_PROTECT_LEN       = 8
+COMMAND_BL_READ_SECTOR_P_STATUS_LEN = 6
+COMMAND_BL_DIS_R_W_PROTECT_LEN      = 6
+COMMAND_BL_MY_NEW_COMMAND_LEN       = 8
 
 
 verbose_mode = 1
