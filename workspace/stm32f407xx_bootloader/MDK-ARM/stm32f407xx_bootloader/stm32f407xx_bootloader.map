@@ -67,11 +67,11 @@ Section Cross References
     main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_GetVer_Cmd_Handler) for Bootloader_GetVer_Cmd_Handler
     main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_GetHelp_Cmd_Handler) for Bootloader_GetHelp_Cmd_Handler
     main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_GetCID_Cmd_Handler) for Bootloader_GetCID_Cmd_Handler
-    main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) for Bootloader_GetRDPLevel_Cmd_Handler
     main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_GoToAddr_Cmd_Handler) for Bootloader_GoToAddr_Cmd_Handler
     main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_EraseFlash_Cmd_Handler) for Bootloader_EraseFlash_Cmd_Handler
-    main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_WriteMem_Cmd_Handler) for Bootloader_WriteMem_Cmd_Handler
     main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_ReadMem_Cmd_Handler) for Bootloader_ReadMem_Cmd_Handler
+    main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_WriteMem_Cmd_Handler) for Bootloader_WriteMem_Cmd_Handler
+    main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) for Bootloader_GetRDPLevel_Cmd_Handler
     main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_EnableWRP_Cmd_Handler) for Bootloader_EnableWRP_Cmd_Handler
     main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_DisableWRP_Cmd_Handler) for Bootloader_DisableWRP_Cmd_Handler
     main.o(.text.Bootloader_UART_Read_Data) refers to main.o(.text.Bootloader_GetWRPStatus_Cmd_Handler) for Bootloader_GetWRPStatus_Cmd_Handler
@@ -106,15 +106,7 @@ Section Cross References
     main.o(.text.Bootloader_GetCID_Cmd_Handler) refers to main.o(.text.Bootloader_UART_Write_Data) for Bootloader_UART_Write_Data
     main.o(.text.Bootloader_GetCID_Cmd_Handler) refers to main.o(.text.Bootloader_Tx_NACK) for Bootloader_Tx_NACK
     main.o(.ARM.exidx.text.Bootloader_GetCID_Cmd_Handler) refers to main.o(.text.Bootloader_GetCID_Cmd_Handler) for [Anonymous Symbol]
-    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.rodata.str1.1) for .L.str.13
-    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Print_Msg) for Print_Msg
-    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Bootloader_Verify_CRC) for Bootloader_Verify_CRC
-    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Bootloader_Tx_ACK) for Bootloader_Tx_ACK
-    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Get_Flash_RDP_Level) for Get_Flash_RDP_Level
-    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Bootloader_UART_Write_Data) for Bootloader_UART_Write_Data
-    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Bootloader_Tx_NACK) for Bootloader_Tx_NACK
-    main.o(.ARM.exidx.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) for [Anonymous Symbol]
-    main.o(.text.Bootloader_GoToAddr_Cmd_Handler) refers to main.o(.rodata.str1.1) for .L.str.16
+    main.o(.text.Bootloader_GoToAddr_Cmd_Handler) refers to main.o(.rodata.str1.1) for .L.str.13
     main.o(.text.Bootloader_GoToAddr_Cmd_Handler) refers to main.o(.text.Print_Msg) for Print_Msg
     main.o(.text.Bootloader_GoToAddr_Cmd_Handler) refers to main.o(.text.Bootloader_Verify_CRC) for Bootloader_Verify_CRC
     main.o(.text.Bootloader_GoToAddr_Cmd_Handler) refers to main.o(.text.Bootloader_Tx_ACK) for Bootloader_Tx_ACK
@@ -122,7 +114,7 @@ Section Cross References
     main.o(.text.Bootloader_GoToAddr_Cmd_Handler) refers to main.o(.text.Bootloader_UART_Write_Data) for Bootloader_UART_Write_Data
     main.o(.text.Bootloader_GoToAddr_Cmd_Handler) refers to main.o(.text.Bootloader_Tx_NACK) for Bootloader_Tx_NACK
     main.o(.ARM.exidx.text.Bootloader_GoToAddr_Cmd_Handler) refers to main.o(.text.Bootloader_GoToAddr_Cmd_Handler) for [Anonymous Symbol]
-    main.o(.text.Bootloader_EraseFlash_Cmd_Handler) refers to main.o(.rodata.str1.1) for .L.str.20
+    main.o(.text.Bootloader_EraseFlash_Cmd_Handler) refers to main.o(.rodata.str1.1) for .L.str.17
     main.o(.text.Bootloader_EraseFlash_Cmd_Handler) refers to main.o(.text.Print_Msg) for Print_Msg
     main.o(.text.Bootloader_EraseFlash_Cmd_Handler) refers to main.o(.text.Bootloader_Verify_CRC) for Bootloader_Verify_CRC
     main.o(.text.Bootloader_EraseFlash_Cmd_Handler) refers to main.o(.text.Bootloader_Tx_ACK) for Bootloader_Tx_ACK
@@ -131,17 +123,25 @@ Section Cross References
     main.o(.text.Bootloader_EraseFlash_Cmd_Handler) refers to main.o(.text.Bootloader_UART_Write_Data) for Bootloader_UART_Write_Data
     main.o(.text.Bootloader_EraseFlash_Cmd_Handler) refers to main.o(.text.Bootloader_Tx_NACK) for Bootloader_Tx_NACK
     main.o(.ARM.exidx.text.Bootloader_EraseFlash_Cmd_Handler) refers to main.o(.text.Bootloader_EraseFlash_Cmd_Handler) for [Anonymous Symbol]
-    main.o(.text.Bootloader_WriteMem_Cmd_Handler) refers to main.o(.rodata.str1.1) for .L.str.23
+    main.o(.ARM.exidx.text.Bootloader_ReadMem_Cmd_Handler) refers to main.o(.text.Bootloader_ReadMem_Cmd_Handler) for [Anonymous Symbol]
+    main.o(.text.Bootloader_WriteMem_Cmd_Handler) refers to main.o(.rodata.str1.1) for .L.str.20
     main.o(.text.Bootloader_WriteMem_Cmd_Handler) refers to main.o(.text.Print_Msg) for Print_Msg
     main.o(.text.Bootloader_WriteMem_Cmd_Handler) refers to main.o(.text.Bootloader_Verify_CRC) for Bootloader_Verify_CRC
     main.o(.text.Bootloader_WriteMem_Cmd_Handler) refers to main.o(.text.Bootloader_Tx_ACK) for Bootloader_Tx_ACK
     main.o(.text.Bootloader_WriteMem_Cmd_Handler) refers to main.o(.text.Verify_Addr) for Verify_Addr
     main.o(.text.Bootloader_WriteMem_Cmd_Handler) refers to stm32f4xx_hal_gpio.o(.text.HAL_GPIO_WritePin) for HAL_GPIO_WritePin
-    main.o(.text.Bootloader_WriteMem_Cmd_Handler) refers to main.o(.text.Execute_MEMORY_Write) for Execute_MEMORY_Write
+    main.o(.text.Bootloader_WriteMem_Cmd_Handler) refers to main.o(.text.Execute_Memory_Write) for Execute_Memory_Write
     main.o(.text.Bootloader_WriteMem_Cmd_Handler) refers to main.o(.text.Bootloader_UART_Write_Data) for Bootloader_UART_Write_Data
     main.o(.text.Bootloader_WriteMem_Cmd_Handler) refers to main.o(.text.Bootloader_Tx_NACK) for Bootloader_Tx_NACK
     main.o(.ARM.exidx.text.Bootloader_WriteMem_Cmd_Handler) refers to main.o(.text.Bootloader_WriteMem_Cmd_Handler) for [Anonymous Symbol]
-    main.o(.ARM.exidx.text.Bootloader_ReadMem_Cmd_Handler) refers to main.o(.text.Bootloader_ReadMem_Cmd_Handler) for [Anonymous Symbol]
+    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.rodata.str1.1) for .L.str.24
+    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Print_Msg) for Print_Msg
+    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Bootloader_Verify_CRC) for Bootloader_Verify_CRC
+    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Bootloader_Tx_ACK) for Bootloader_Tx_ACK
+    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Get_Flash_RDP_Level) for Get_Flash_RDP_Level
+    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Bootloader_UART_Write_Data) for Bootloader_UART_Write_Data
+    main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Bootloader_Tx_NACK) for Bootloader_Tx_NACK
+    main.o(.ARM.exidx.text.Bootloader_GetRDPLevel_Cmd_Handler) refers to main.o(.text.Bootloader_GetRDPLevel_Cmd_Handler) for [Anonymous Symbol]
     main.o(.text.Bootloader_EnableWRP_Cmd_Handler) refers to main.o(.rodata.str1.1) for .L.str.27
     main.o(.text.Bootloader_EnableWRP_Cmd_Handler) refers to main.o(.text.Print_Msg) for Print_Msg
     main.o(.text.Bootloader_EnableWRP_Cmd_Handler) refers to main.o(.text.Bootloader_Verify_CRC) for Bootloader_Verify_CRC
@@ -180,8 +180,17 @@ Section Cross References
     main.o(.text.Bootloader_Tx_NACK) refers to stm32f4xx_hal_uart.o(.text.HAL_UART_Transmit) for HAL_UART_Transmit
     main.o(.ARM.exidx.text.Bootloader_Tx_NACK) refers to main.o(.text.Bootloader_Tx_NACK) for [Anonymous Symbol]
     main.o(.ARM.exidx.text.Get_MCU_Chip_ID) refers to main.o(.text.Get_MCU_Chip_ID) for [Anonymous Symbol]
+    main.o(.ARM.exidx.text.Verify_Addr) refers to main.o(.text.Verify_Addr) for [Anonymous Symbol]
+    main.o(.text.Execute_Flash_Erase) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_Unlock) for HAL_FLASH_Unlock
+    main.o(.text.Execute_Flash_Erase) refers to stm32f4xx_hal_flash_ex.o(.text.HAL_FLASHEx_Erase) for HAL_FLASHEx_Erase
+    main.o(.text.Execute_Flash_Erase) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_Lock) for HAL_FLASH_Lock
+    main.o(.ARM.exidx.text.Execute_Flash_Erase) refers to main.o(.text.Execute_Flash_Erase) for [Anonymous Symbol]
+    main.o(.text.Execute_Memory_Write) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_Unlock) for HAL_FLASH_Unlock
+    main.o(.text.Execute_Memory_Write) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_Program) for HAL_FLASH_Program
+    main.o(.text.Execute_Memory_Write) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_Lock) for HAL_FLASH_Lock
+    main.o(.ARM.exidx.text.Execute_Memory_Write) refers to main.o(.text.Execute_Memory_Write) for [Anonymous Symbol]
     main.o(.ARM.exidx.text.Get_Flash_RDP_Level) refers to main.o(.text.Get_Flash_RDP_Level) for [Anonymous Symbol]
-    main.o(.text.Bootloader_SetRDPLevel_Cmd_Handler) refers to main.o(.rodata.str1.1) for .L.str.15
+    main.o(.text.Bootloader_SetRDPLevel_Cmd_Handler) refers to main.o(.rodata.str1.1) for .L.str.26
     main.o(.text.Bootloader_SetRDPLevel_Cmd_Handler) refers to main.o(.text.Print_Msg) for Print_Msg
     main.o(.text.Bootloader_SetRDPLevel_Cmd_Handler) refers to main.o(.text.Bootloader_Verify_CRC) for Bootloader_Verify_CRC
     main.o(.text.Bootloader_SetRDPLevel_Cmd_Handler) refers to main.o(.text.Bootloader_Tx_ACK) for Bootloader_Tx_ACK
@@ -192,15 +201,6 @@ Section Cross References
     main.o(.text.Set_Flash_RDP_Level) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_OB_Unlock) for HAL_FLASH_OB_Unlock
     main.o(.text.Set_Flash_RDP_Level) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_OB_Lock) for HAL_FLASH_OB_Lock
     main.o(.ARM.exidx.text.Set_Flash_RDP_Level) refers to main.o(.text.Set_Flash_RDP_Level) for [Anonymous Symbol]
-    main.o(.ARM.exidx.text.Verify_Addr) refers to main.o(.text.Verify_Addr) for [Anonymous Symbol]
-    main.o(.text.Execute_Flash_Erase) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_Unlock) for HAL_FLASH_Unlock
-    main.o(.text.Execute_Flash_Erase) refers to stm32f4xx_hal_flash_ex.o(.text.HAL_FLASHEx_Erase) for HAL_FLASHEx_Erase
-    main.o(.text.Execute_Flash_Erase) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_Lock) for HAL_FLASH_Lock
-    main.o(.ARM.exidx.text.Execute_Flash_Erase) refers to main.o(.text.Execute_Flash_Erase) for [Anonymous Symbol]
-    main.o(.text.Execute_MEMORY_Write) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_Unlock) for HAL_FLASH_Unlock
-    main.o(.text.Execute_MEMORY_Write) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_Program) for HAL_FLASH_Program
-    main.o(.text.Execute_MEMORY_Write) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_Lock) for HAL_FLASH_Lock
-    main.o(.ARM.exidx.text.Execute_MEMORY_Write) refers to main.o(.text.Execute_MEMORY_Write) for [Anonymous Symbol]
     main.o(.text.Configure_Flash_WRP) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_OB_Unlock) for HAL_FLASH_OB_Unlock
     main.o(.text.Configure_Flash_WRP) refers to stm32f4xx_hal_flash.o(.text.HAL_FLASH_OB_Lock) for HAL_FLASH_OB_Lock
     main.o(.ARM.exidx.text.Configure_Flash_WRP) refers to main.o(.text.Configure_Flash_WRP) for [Anonymous Symbol]
@@ -1000,11 +1000,11 @@ Removing Unused input sections from the image.
     Removing main.o(.ARM.exidx.text.Bootloader_GetVer_Cmd_Handler), (8 bytes).
     Removing main.o(.ARM.exidx.text.Bootloader_GetHelp_Cmd_Handler), (8 bytes).
     Removing main.o(.ARM.exidx.text.Bootloader_GetCID_Cmd_Handler), (8 bytes).
-    Removing main.o(.ARM.exidx.text.Bootloader_GetRDPLevel_Cmd_Handler), (8 bytes).
     Removing main.o(.ARM.exidx.text.Bootloader_GoToAddr_Cmd_Handler), (8 bytes).
     Removing main.o(.ARM.exidx.text.Bootloader_EraseFlash_Cmd_Handler), (8 bytes).
-    Removing main.o(.ARM.exidx.text.Bootloader_WriteMem_Cmd_Handler), (8 bytes).
     Removing main.o(.ARM.exidx.text.Bootloader_ReadMem_Cmd_Handler), (8 bytes).
+    Removing main.o(.ARM.exidx.text.Bootloader_WriteMem_Cmd_Handler), (8 bytes).
+    Removing main.o(.ARM.exidx.text.Bootloader_GetRDPLevel_Cmd_Handler), (8 bytes).
     Removing main.o(.ARM.exidx.text.Bootloader_EnableWRP_Cmd_Handler), (8 bytes).
     Removing main.o(.ARM.exidx.text.Bootloader_DisableWRP_Cmd_Handler), (8 bytes).
     Removing main.o(.ARM.exidx.text.Bootloader_GetWRPStatus_Cmd_Handler), (8 bytes).
@@ -1016,14 +1016,14 @@ Removing Unused input sections from the image.
     Removing main.o(.ARM.exidx.text.Bootloader_UART_Write_Data), (8 bytes).
     Removing main.o(.ARM.exidx.text.Bootloader_Tx_NACK), (8 bytes).
     Removing main.o(.ARM.exidx.text.Get_MCU_Chip_ID), (8 bytes).
+    Removing main.o(.ARM.exidx.text.Verify_Addr), (8 bytes).
+    Removing main.o(.ARM.exidx.text.Execute_Flash_Erase), (8 bytes).
+    Removing main.o(.ARM.exidx.text.Execute_Memory_Write), (8 bytes).
     Removing main.o(.ARM.exidx.text.Get_Flash_RDP_Level), (8 bytes).
     Removing main.o(.text.Bootloader_SetRDPLevel_Cmd_Handler), (146 bytes).
     Removing main.o(.ARM.exidx.text.Bootloader_SetRDPLevel_Cmd_Handler), (8 bytes).
     Removing main.o(.text.Set_Flash_RDP_Level), (168 bytes).
     Removing main.o(.ARM.exidx.text.Set_Flash_RDP_Level), (8 bytes).
-    Removing main.o(.ARM.exidx.text.Verify_Addr), (8 bytes).
-    Removing main.o(.ARM.exidx.text.Execute_Flash_Erase), (8 bytes).
-    Removing main.o(.ARM.exidx.text.Execute_MEMORY_Write), (8 bytes).
     Removing main.o(.ARM.exidx.text.Configure_Flash_WRP), (8 bytes).
     Removing main.o(.data.data), (26 bytes).
     Removing main.o(.ARM.use_no_argv), (4 bytes).
@@ -1816,7 +1816,7 @@ Image Symbol Table
     [Anonymous Symbol]                       0x08001fa4   Section        0  stm32f4xx_it.o(.text.DebugMon_Handler)
     [Anonymous Symbol]                       0x08001fa8   Section        0  main.o(.text.Error_Handler)
     [Anonymous Symbol]                       0x08001fb8   Section        0  main.o(.text.Execute_Flash_Erase)
-    [Anonymous Symbol]                       0x08002068   Section        0  main.o(.text.Execute_MEMORY_Write)
+    [Anonymous Symbol]                       0x08002068   Section        0  main.o(.text.Execute_Memory_Write)
     [Anonymous Symbol]                       0x080020bc   Section        0  stm32f4xx_hal_flash_ex.o(.text.FLASH_Erase_Sector)
     [Anonymous Symbol]                       0x08002140   Section        0  stm32f4xx_hal_flash_ex.o(.text.FLASH_FlushCaches)
     FLASH_MassErase                          0x080021e5   Thumb Code    52  stm32f4xx_hal_flash_ex.o(.text.FLASH_MassErase)
@@ -1939,31 +1939,31 @@ Image Symbol Table
     .L.str.11                                0x08004f61   Data          47  main.o(.rodata.str1.1)
     .L.str.27                                0x08004f90   Data          50  main.o(.rodata.str1.1)
     .L.str.29                                0x08004fc2   Data          51  main.o(.rodata.str1.1)
-    .L.str.20                                0x08004ff5   Data          51  main.o(.rodata.str1.1)
-    .L.str.13                                0x08005028   Data          52  main.o(.rodata.str1.1)
-    .L.str.23                                0x0800505c   Data          49  main.o(.rodata.str1.1)
+    .L.str.17                                0x08004ff5   Data          51  main.o(.rodata.str1.1)
+    .L.str.24                                0x08005028   Data          52  main.o(.rodata.str1.1)
+    .L.str.20                                0x0800505c   Data          49  main.o(.rodata.str1.1)
     .L.str.10                                0x0800508d   Data          48  main.o(.rodata.str1.1)
     .L.str.31                                0x080050bd   Data          57  main.o(.rodata.str1.1)
     .L.str.6                                 0x080050f6   Data          47  main.o(.rodata.str1.1)
-    .L.str.21                                0x08005125   Data          57  main.o(.rodata.str1.1)
-    .L.str.25                                0x0800515e   Data          39  main.o(.rodata.str1.1)
-    .L.str.26                                0x08005185   Data          48  main.o(.rodata.str1.1)
-    .L.str.15                                0x0800518c   Data          52  main.o(.rodata.str1.1)
-    .L.str.16                                0x080051b5   Data          47  main.o(.rodata.str1.1)
-    .L.str.19                                0x080051e4   Data          38  main.o(.rodata.str1.1)
-    .L.str.18                                0x0800520a   Data          45  main.o(.rodata.str1.1)
+    .L.str.18                                0x08005125   Data          57  main.o(.rodata.str1.1)
+    .L.str.22                                0x0800515e   Data          39  main.o(.rodata.str1.1)
+    .L.str.23                                0x08005185   Data          48  main.o(.rodata.str1.1)
+    .L.str.13                                0x080051b5   Data          47  main.o(.rodata.str1.1)
+    .L.str.16                                0x080051e4   Data          38  main.o(.rodata.str1.1)
+    .L.str.15                                0x0800520a   Data          45  main.o(.rodata.str1.1)
     .L.str.2                                 0x08005237   Data          59  main.o(.rodata.str1.1)
     .L.str.32                                0x08005272   Data          35  main.o(.rodata.str1.1)
     .L.str.4                                 0x08005295   Data          24  main.o(.rodata.str1.1)
-    .L.str.24                                0x080052ad   Data          47  main.o(.rodata.str1.1)
-    .L.str.17                                0x080052dc   Data          46  main.o(.rodata.str1.1)
+    .L.str.21                                0x080052ad   Data          47  main.o(.rodata.str1.1)
+    .L.str.14                                0x080052dc   Data          46  main.o(.rodata.str1.1)
     .L.str.5                                 0x0800530a   Data          61  main.o(.rodata.str1.1)
     .L.str.28                                0x08005347   Data          51  main.o(.rodata.str1.1)
     .L.str.30                                0x0800537a   Data          52  main.o(.rodata.str1.1)
-    .L.str.22                                0x080053ae   Data          39  main.o(.rodata.str1.1)
+    .L.str.26                                0x08005386   Data          52  main.o(.rodata.str1.1)
+    .L.str.19                                0x080053ae   Data          39  main.o(.rodata.str1.1)
     .L.str.12                                0x080053d5   Data          35  main.o(.rodata.str1.1)
     .L.str.8                                 0x080053f8   Data          30  main.o(.rodata.str1.1)
-    .L.str.14                                0x08005416   Data          33  main.o(.rodata.str1.1)
+    .L.str.25                                0x08005416   Data          33  main.o(.rodata.str1.1)
     .L.str                                   0x08005437   Data          52  main.o(.rodata.str1.1)
     .L.str.1                                 0x0800546b   Data          67  main.o(.rodata.str1.1)
     locale$$data                             0x080054d0   Section       28  lc_numeric_c.o(locale$$data)
@@ -2265,7 +2265,7 @@ Image Symbol Table
     DebugMon_Handler                         0x08001fa5   Thumb Code     2  stm32f4xx_it.o(.text.DebugMon_Handler)
     Error_Handler                            0x08001fa9   Thumb Code    14  main.o(.text.Error_Handler)
     Execute_Flash_Erase                      0x08001fb9   Thumb Code   174  main.o(.text.Execute_Flash_Erase)
-    Execute_MEMORY_Write                     0x08002069   Thumb Code    82  main.o(.text.Execute_MEMORY_Write)
+    Execute_Memory_Write                     0x08002069   Thumb Code    82  main.o(.text.Execute_Memory_Write)
     FLASH_Erase_Sector                       0x080020bd   Thumb Code   132  stm32f4xx_hal_flash_ex.o(.text.FLASH_Erase_Sector)
     FLASH_FlushCaches                        0x08002141   Thumb Code   162  stm32f4xx_hal_flash_ex.o(.text.FLASH_FlushCaches)
     FLASH_WaitForLastOperation               0x080023dd   Thumb Code   164  stm32f4xx_hal_flash.o(.text.FLASH_WaitForLastOperation)
@@ -2485,19 +2485,19 @@ Memory Map of the image
     0x080015cc   0x080015cc   0x00000092   Code   RO           47    .text.Bootloader_DisableWRP_Cmd_Handler  main.o
     0x0800165e   0x0800165e   0x00000002   PAD
     0x08001660   0x08001660   0x00000094   Code   RO           45    .text.Bootloader_EnableWRP_Cmd_Handler  main.o
-    0x080016f4   0x080016f4   0x000000c8   Code   RO           39    .text.Bootloader_EraseFlash_Cmd_Handler  main.o
+    0x080016f4   0x080016f4   0x000000c8   Code   RO           37    .text.Bootloader_EraseFlash_Cmd_Handler  main.o
     0x080017bc   0x080017bc   0x0000008a   Code   RO           33    .text.Bootloader_GetCID_Cmd_Handler  main.o
     0x08001846   0x08001846   0x00000002   PAD
     0x08001848   0x08001848   0x00000074   Code   RO           31    .text.Bootloader_GetHelp_Cmd_Handler  main.o
-    0x080018bc   0x080018bc   0x00000090   Code   RO           35    .text.Bootloader_GetRDPLevel_Cmd_Handler  main.o
+    0x080018bc   0x080018bc   0x00000090   Code   RO           43    .text.Bootloader_GetRDPLevel_Cmd_Handler  main.o
     0x0800194c   0x0800194c   0x0000008a   Code   RO           29    .text.Bootloader_GetVer_Cmd_Handler  main.o
     0x080019d6   0x080019d6   0x00000002   PAD
     0x080019d8   0x080019d8   0x00000076   Code   RO           49    .text.Bootloader_GetWRPStatus_Cmd_Handler  main.o
     0x08001a4e   0x08001a4e   0x00000002   PAD
-    0x08001a50   0x08001a50   0x000000d0   Code   RO           37    .text.Bootloader_GoToAddr_Cmd_Handler  main.o
+    0x08001a50   0x08001a50   0x000000d0   Code   RO           35    .text.Bootloader_GoToAddr_Cmd_Handler  main.o
     0x08001b20   0x08001b20   0x0000005a   Code   RO           27    .text.Bootloader_Jump_To_User_App  main.o
     0x08001b7a   0x08001b7a   0x00000002   PAD
-    0x08001b7c   0x08001b7c   0x00000008   Code   RO           43    .text.Bootloader_ReadMem_Cmd_Handler  main.o
+    0x08001b7c   0x08001b7c   0x00000008   Code   RO           39    .text.Bootloader_ReadMem_Cmd_Handler  main.o
     0x08001b84   0x08001b84   0x00000008   Code   RO           51    .text.Bootloader_ReadOTP_Cmd_Handler  main.o
     0x08001b8c   0x08001b8c   0x00000032   Code   RO           57    .text.Bootloader_Tx_ACK  main.o
     0x08001bbe   0x08001bbe   0x00000002   PAD
@@ -2516,9 +2516,9 @@ Memory Map of the image
     0x08001fa6   0x08001fa6   0x00000002   PAD
     0x08001fa8   0x08001fa8   0x0000000e   Code   RO           53    .text.Error_Handler  main.o
     0x08001fb6   0x08001fb6   0x00000002   PAD
-    0x08001fb8   0x08001fb8   0x000000ae   Code   RO           75    .text.Execute_Flash_Erase  main.o
+    0x08001fb8   0x08001fb8   0x000000ae   Code   RO           69    .text.Execute_Flash_Erase  main.o
     0x08002066   0x08002066   0x00000002   PAD
-    0x08002068   0x08002068   0x00000052   Code   RO           77    .text.Execute_MEMORY_Write  main.o
+    0x08002068   0x08002068   0x00000052   Code   RO           71    .text.Execute_Memory_Write  main.o
     0x080020ba   0x080020ba   0x00000002   PAD
     0x080020bc   0x080020bc   0x00000084   Code   RO          259    .text.FLASH_Erase_Sector  stm32f4xx_hal_flash_ex.o
     0x08002140   0x08002140   0x000000a2   Code   RO          261    .text.FLASH_FlushCaches  stm32f4xx_hal_flash_ex.o
@@ -2532,7 +2532,7 @@ Memory Map of the image
     0x080023da   0x080023da   0x00000002   PAD
     0x080023dc   0x080023dc   0x000000a4   Code   RO          215    .text.FLASH_WaitForLastOperation  stm32f4xx_hal_flash.o
     0x08002480   0x08002480   0x00000004   Code   RO           59    .text.Get_Bootloader_Version  main.o
-    0x08002484   0x08002484   0x00000024   Code   RO           67    .text.Get_Flash_RDP_Level  main.o
+    0x08002484   0x08002484   0x00000024   Code   RO           73    .text.Get_Flash_RDP_Level  main.o
     0x080024a8   0x080024a8   0x00000010   Code   RO           65    .text.Get_MCU_Chip_ID  main.o
     0x080024b8   0x080024b8   0x0000004c   Code   RO          146    .text.HAL_CRC_Accumulate  stm32f4xx_hal_crc.o
     0x08002504   0x08002504   0x00000040   Code   RO          138    .text.HAL_CRC_Init  stm32f4xx_hal_crc.o
@@ -2607,7 +2607,7 @@ Memory Map of the image
     0x08004314   0x08004314   0x000000d2   Code   RO          611    .text.UART_WaitOnFlagUntilTimeout  stm32f4xx_hal_uart.o
     0x080043e6   0x080043e6   0x00000002   PAD
     0x080043e8   0x080043e8   0x00000004   Code   RO          104    .text.UsageFault_Handler  stm32f4xx_it.o
-    0x080043ec   0x080043ec   0x000000a2   Code   RO           73    .text.Verify_Addr   main.o
+    0x080043ec   0x080043ec   0x000000a2   Code   RO           67    .text.Verify_Addr   main.o
     0x0800448e   0x0800448e   0x00000002   PAD
     0x08004490   0x08004490   0x00000010   Code   RO          437    .text.__NVIC_GetPriorityGrouping  stm32f4xx_hal_cortex.o
     0x080044a0   0x080044a0   0x00000042   Code   RO          439    .text.__NVIC_SetPriority  stm32f4xx_hal_cortex.o

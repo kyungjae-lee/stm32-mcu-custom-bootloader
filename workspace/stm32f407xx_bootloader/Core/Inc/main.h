@@ -60,14 +60,14 @@ void Error_Handler(void);
 void Bootloader_GetVer_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_GetHelp_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_GetCID_Cmd_Handler(uint8_t *pBLRxBuffer);
-void Bootloader_GetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer);
-void Bootloader_SetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer);	// TODO
 void Bootloader_GoToAddr_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_EraseFlash_Cmd_Handler(uint8_t *pBLRxBuffer);
-void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_ReadMem_Cmd_Handler(uint8_t *pBLRxBuffer);
-void Bootloader_DisableWRP_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_GetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_SetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_EnableWRP_Cmd_Handler(uint8_t *pBLRxBuffer);
+void Bootloader_DisableWRP_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_GetWRPStatus_Cmd_Handler(uint8_t *pBLRxBuffer);
 void Bootloader_ReadOTP_Cmd_Handler(uint8_t *pBLRxBuffer);
 
@@ -82,7 +82,7 @@ uint8_t Get_Flash_RDP_Level(void);
 uint8_t Set_Flash_RDP_Level(uint8_t rdpLevel);
 uint8_t Verify_Addr(uint32_t addr);
 uint8_t Execute_Flash_Erase(uint8_t sectorNumber, uint8_t numberOfSectors);
-uint8_t Execute_MEMORY_Write(uint8_t *pBuffer, uint32_t memAddr, uint32_t len);
+uint8_t Execute_Memory_Write(uint8_t *pBuffer, uint32_t memAddr, uint32_t len);
 uint8_t Configure_Flash_WRP(uint8_t nwrp, uint8_t disable);
 
 /* Bootloader function prototypes */

@@ -69,12 +69,12 @@ uint8_t supportedCmds[] = {
 	BL_GET_VER,
 	BL_GET_HELP,
 	BL_GET_CID,
-	BL_GET_RDP_LEVEL,
-	BL_SET_RDP_LEVEL,
 	BL_GO_TO_ADDR,
 	BL_ERASE_FLASH,
-	BL_WRITE_MEM,
 	BL_READ_MEM,
+	BL_WRITE_MEM,
+	BL_GET_RDP_LEVEL,
+	BL_SET_RDP_LEVEL,
 	BL_ENABLE_WRP,
 	BL_DISABLE_WRP,
 	BL_GET_WRP_STATUS,
@@ -190,23 +190,23 @@ void Bootloader_UART_Read_Data(void)
 			case BL_GET_CID:
 				Bootloader_GetCID_Cmd_Handler(blRxBuffer);
 				break;
-			case BL_GET_RDP_LEVEL:
-				Bootloader_GetRDPLevel_Cmd_Handler(blRxBuffer);
-				break;
-			case BL_SET_RDP_LEVEL:
-				Bootloader_GetRDPLevel_Cmd_Handler(blRxBuffer);
-				break;
 			case BL_GO_TO_ADDR:
 				Bootloader_GoToAddr_Cmd_Handler(blRxBuffer);
 				break;
 			case BL_ERASE_FLASH:
 				Bootloader_EraseFlash_Cmd_Handler(blRxBuffer);
 				break;
+			case BL_READ_MEM:
+				Bootloader_ReadMem_Cmd_Handler(blRxBuffer);
+				break;
 			case BL_WRITE_MEM:
 				Bootloader_WriteMem_Cmd_Handler(blRxBuffer);
 				break;
-			case BL_READ_MEM:
-				Bootloader_ReadMem_Cmd_Handler(blRxBuffer);
+			case BL_GET_RDP_LEVEL:
+				Bootloader_GetRDPLevel_Cmd_Handler(blRxBuffer);
+				break;
+			case BL_SET_RDP_LEVEL:
+				Bootloader_GetRDPLevel_Cmd_Handler(blRxBuffer);
 				break;
 			case BL_ENABLE_WRP:
 				Bootloader_EnableWRP_Cmd_Handler(blRxBuffer);
@@ -693,100 +693,6 @@ void Bootloader_GetCID_Cmd_Handler(uint8_t *pBLRxBuffer)
 } /* End of Bootloader_GetCID_Cmd_Handler */
 
 /**
- * Bootloader_GetRDPLevel_Cmd_Handler()
- * Brief	: Handles BL_GET_RDP_LEVEL command
- * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * Retval	: None
- * Note		: BL_GET_RDP_LEVEL command is used to read the Flash Read Protection
- *            (RDP) level.
- */
-void Bootloader_GetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer)
-{
-	uint8_t rdpLevel = 0x00;
-	Print_Msg("BL_DEBUG_MSG: Bootloader_GetRDPLevel_Cmd_Handler()\n");
-
-	/* Total length of the command packet */
-	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
-	
-	/* Extract the CRC32 sent by the host */
-	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
-
-	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
-	{
-		/* Checksum is correct */
-		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
-		
-		/* Send ACK */
-		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
-		
-		rdpLevel = Get_Flash_RDP_Level();
-		Print_Msg("BL_DEBUG_MSG: RDP level: %d %#x\n", rdpLevel, rdpLevel);
-		
-		/* Send response to the host */
-		Bootloader_UART_Write_Data(&rdpLevel, 1);
-	}
-	else
-	{
-		/* Checksum is not correct */
-		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
-		
-		/* Send NACK */
-		Bootloader_Tx_NACK();
-	}
-} /* End of Bootloader_GetRDPLevel_Cmd_Handler */
-
-/**
- * Bootloader_SetRDPLevel_Cmd_Handler()
- * Brief	: Handles BL_SET_RDP_LEVEL command
- * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * Retval	: None
- * Note		: BL_SET_RDP_LEVEL command is used to set the Flash Read Protection
- *            (RDP) level.
- *			  - When Level 2 is activated, the Level of protection cannot be 
- *				degraded to Level 1 or Level 0. This is an irreversible operation.
- *			  - Switching to Level 2 should only be done during the production
- *				phase to impose some restrictions before handing the product to
- *				the customer so that they cannot access or modify the production
- *				code.
- *			  - During the development phase, DO NOT change the RDP status to Level 2!
- */
-void Bootloader_SetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer)
-{
-	uint8_t rdpLevel;
-	Print_Msg("BL_DEBUG_MSG: Bootloader_SetRDPLevel_Cmd_Handler()\n");
-
-	/* Total length of the command packet */
-	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
-	
-	/* Extract the CRC32 sent by the host */
-	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
-
-	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
-	{
-		/* Checksum is correct */
-		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
-		
-		/* Send ACK */
-		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
-		
-		rdpLevel = pBLRxBuffer[2];
-		Set_Flash_RDP_Level(rdpLevel);
-		Print_Msg("BL_DEBUG_MSG: RDP level: %d %#x\n", rdpLevel, rdpLevel);
-		
-		/* Send response to the host */
-		Bootloader_UART_Write_Data(&rdpLevel, 1);
-	}
-	else
-	{
-		/* Checksum is not correct */
-		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
-		
-		/* Send NACK */
-		Bootloader_Tx_NACK();
-	}
-} /* End of Bootloader_SetRDPLevel_Cmd_Handler */
-
-/**
  * Bootloader_GoToAddr_Cmd_Handler()
  * Brief	: Handles BL_GO_TO_ADDR command
  * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
@@ -916,6 +822,19 @@ void Bootloader_EraseFlash_Cmd_Handler(uint8_t *pBLRxBuffer)
 } /* End of Bootloader_EraseFlash_Cmd_Handler */
 
 /**
+ * Bootloader_ReadMem_Cmd_Handler()
+ * Brief	: Handles BL_READ_MEM command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_READ_MEM command is used to read data from different memories of
+ * 			  the MCU.
+ */
+void Bootloader_ReadMem_Cmd_Handler(uint8_t *pBLRxBuffer)
+{
+	// TODO
+} /* End of Bootloader_ReadMem_Cmd_Handler */
+
+/**
  * Bootloader_WriteMem_Cmd_Handler()
  * Brief	: Handles BL_WRITE_MEM command
  * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
@@ -966,7 +885,7 @@ void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBLRxBuffer)
 			/* Turn on the LED to indicate that the bootloader's write operation is on */
 			HAL_GPIO_WritePin(LD4_GPIO_PORT, LD4_PIN, GPIO_PIN_SET);
 			/* Execute memory write */
-			writeStatus = Execute_MEMORY_Write(&pBLRxBuffer[7], memAddr, payloadLen);
+			writeStatus = Execute_Memory_Write(&pBLRxBuffer[7], memAddr, payloadLen);
 			
 			/* Turn off the LED to indicate that the bootloader's write operation is over */
 			HAL_GPIO_WritePin(LD4_GPIO_PORT, LD4_PIN, GPIO_PIN_RESET);
@@ -992,6 +911,100 @@ void Bootloader_WriteMem_Cmd_Handler(uint8_t *pBLRxBuffer)
 		Bootloader_Tx_NACK();
 	}
 } /* End of Bootloader_WriteMem_Cmd_Handler */
+
+/**
+ * Bootloader_GetRDPLevel_Cmd_Handler()
+ * Brief	: Handles BL_GET_RDP_LEVEL command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_GET_RDP_LEVEL command is used to read the Flash Read Protection
+ *            (RDP) level.
+ */
+void Bootloader_GetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer)
+{
+	uint8_t rdpLevel = 0x00;
+	Print_Msg("BL_DEBUG_MSG: Bootloader_GetRDPLevel_Cmd_Handler()\n");
+
+	/* Total length of the command packet */
+	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
+	
+	/* Extract the CRC32 sent by the host */
+	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
+
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
+	{
+		/* Checksum is correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
+		
+		/* Send ACK */
+		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
+		
+		rdpLevel = Get_Flash_RDP_Level();
+		Print_Msg("BL_DEBUG_MSG: RDP level: %d %#x\n", rdpLevel, rdpLevel);
+		
+		/* Send response to the host */
+		Bootloader_UART_Write_Data(&rdpLevel, 1);
+	}
+	else
+	{
+		/* Checksum is not correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
+		
+		/* Send NACK */
+		Bootloader_Tx_NACK();
+	}
+} /* End of Bootloader_GetRDPLevel_Cmd_Handler */
+
+/**
+ * Bootloader_SetRDPLevel_Cmd_Handler()
+ * Brief	: Handles BL_SET_RDP_LEVEL command
+ * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
+ * Retval	: None
+ * Note		: BL_SET_RDP_LEVEL command is used to set the Flash Read Protection
+ *            (RDP) level.
+ *			  - When Level 2 is activated, the Level of protection cannot be 
+ *				degraded to Level 1 or Level 0. This is an irreversible operation.
+ *			  - Switching to Level 2 should only be done during the production
+ *				phase to impose some restrictions before handing the product to
+ *				the customer so that they cannot access or modify the production
+ *				code.
+ *			  - During the development phase, DO NOT change the RDP status to Level 2!
+ */
+void Bootloader_SetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer)
+{
+	uint8_t rdpLevel;
+	Print_Msg("BL_DEBUG_MSG: Bootloader_SetRDPLevel_Cmd_Handler()\n");
+
+	/* Total length of the command packet */
+	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
+	
+	/* Extract the CRC32 sent by the host */
+	uint32_t crcHost = *((uint32_t *)(pBLRxBuffer + cmdPacketLen - 4));
+
+	if (!Bootloader_Verify_CRC(&pBLRxBuffer[0], cmdPacketLen - 4, crcHost))
+	{
+		/* Checksum is correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum verification success!\n");
+		
+		/* Send ACK */
+		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
+		
+		rdpLevel = pBLRxBuffer[2];
+		Set_Flash_RDP_Level(rdpLevel);
+		Print_Msg("BL_DEBUG_MSG: RDP level: %d %#x\n", rdpLevel, rdpLevel);
+		
+		/* Send response to the host */
+		Bootloader_UART_Write_Data(&rdpLevel, 1);
+	}
+	else
+	{
+		/* Checksum is not correct */
+		Print_Msg("BL_DEBUG_MSG: Checksum vrification fail!\n");
+		
+		/* Send NACK */
+		Bootloader_Tx_NACK();
+	}
+} /* End of Bootloader_SetRDPLevel_Cmd_Handler */
 
 /**
  * Bootloader_EnableWRP_Cmd_Handler()
@@ -1085,18 +1098,6 @@ void Bootloader_DisableWRP_Cmd_Handler(uint8_t *pBLRxBuffer)
 } /* End of Bootloader_DisableWRP_Cmd_Handler */
 
 /**
- * Bootloader_ReadMem_Cmd_Handler()
- * Brief	: Handles BL_READ_MEM command
- * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
- * Retval	: None
- * Note		: BL_WRITE_MEM command is used to read data from different memories of
- * 			  the MCU.
- */
-void Bootloader_ReadMem_Cmd_Handler(uint8_t *pBLRxBuffer)
-{
-} /* End of Bootloader_ReadMem_Cmd_Handler */
-
-/**
  * Bootloader_GetWRPStatus_Cmd_Handler()
  * Brief	: Handles BL_GET_WRP_STATUS command
  * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
@@ -1151,6 +1152,7 @@ void Bootloader_GetWRPStatus_Cmd_Handler(uint8_t *pBLRxBuffer)
  */
 void Bootloader_ReadOTP_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
+	// TODO
 } /* End of Bootloader_ReadOTP_Cmd_Handler */
 
 
@@ -1430,7 +1432,7 @@ uint8_t Execute_Flash_Erase(uint8_t sectorNumber, uint8_t numberOfSectors)
 } /* End of Execute_Flash_Erase */
 
 /**
- * Execute_MEMORY_Write()
+ * Execute_Memory_Write()
  * Brief	: Writes the contents of @pBuffer byte-by-byte to @memAddr
  * Param	: @pBuffer - Pointer to a buffer that contains data to write to 
  *			  memory
@@ -1448,7 +1450,7 @@ uint8_t Execute_Flash_Erase(uint8_t sectorNumber, uint8_t numberOfSectors)
  *			  the 'Programming - Standard programming' section of the MCU
  *			  reference manual.
 */
-uint8_t Execute_MEMORY_Write(uint8_t *pBuffer, uint32_t memAddr, uint32_t len)
+uint8_t Execute_Memory_Write(uint8_t *pBuffer, uint32_t memAddr, uint32_t len)
 {
 	uint8_t status = HAL_OK;
 	
@@ -1466,7 +1468,7 @@ uint8_t Execute_MEMORY_Write(uint8_t *pBuffer, uint32_t memAddr, uint32_t len)
 	HAL_FLASH_Lock();
 	
 	return status;
-} /* End of Execute_MEMORY_Write */
+} /* End of Execute_Memory_Write */
 
 /**
  * Configure_Flash_WRP()
