@@ -206,7 +206,7 @@ void Bootloader_UART_Read_Data(void)
 				Bootloader_GetRDPLevel_Cmd_Handler(blRxBuffer);
 				break;
 			case BL_SET_RDP_LEVEL:
-				Bootloader_GetRDPLevel_Cmd_Handler(blRxBuffer);
+				Bootloader_SetRDPLevel_Cmd_Handler(blRxBuffer);
 				break;
 			case BL_ENABLE_WRP:
 				Bootloader_EnableWRP_Cmd_Handler(blRxBuffer);
@@ -973,6 +973,9 @@ void Bootloader_GetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer)
 void Bootloader_SetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 	uint8_t rdpLevel;
+	uint8_t status = 0x00;
+	
+	
 	Print_Msg("BL_DEBUG_MSG: Bootloader_SetRDPLevel_Cmd_Handler()\n");
 
 	/* Total length of the command packet */
@@ -990,11 +993,15 @@ void Bootloader_SetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer)
 		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
 		
 		rdpLevel = pBLRxBuffer[2];
-		Set_Flash_RDP_Level(rdpLevel);
-		Print_Msg("BL_DEBUG_MSG: RDP level: %d %#x\n", rdpLevel, rdpLevel);
+		if (rdpLevel != 0 && rdpLevel != 1 && rdpLevel != 2)
+			status = RDP_INVALID;
+		else
+			status = Set_Flash_RDP_Level(rdpLevel);
+		
+		Print_Msg("BL_DEBUG_MSG: Set RDP level status : %#x\n", status);
 		
 		/* Send response to the host */
-		Bootloader_UART_Write_Data(&rdpLevel, 1);
+		Bootloader_UART_Write_Data(&status, 1);
 	}
 	else
 	{

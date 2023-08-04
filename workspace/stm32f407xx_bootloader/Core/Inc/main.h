@@ -173,16 +173,16 @@ void Bootloader_Jump_To_User_App(void);
 #define BL_GET_VER				0x51
 #define BL_GET_HELP				0x52
 #define BL_GET_CID				0x53
-#define BL_GET_RDP_LEVEL		0x54
-#define BL_SET_RDP_LEVEL		0x5D
-#define BL_GO_TO_ADDR			0x55
-#define BL_ERASE_FLASH			0x56
+#define BL_GO_TO_ADDR			0x54
+#define BL_ERASE_FLASH			0x55
+#define BL_READ_MEM				0x56
 #define BL_WRITE_MEM			0x57
-#define BL_READ_MEM				0x59
-#define BL_ENABLE_WRP			0x58
-#define BL_DISABLE_WRP			0x5C
-#define	BL_GET_WRP_STATUS		0x5A
-#define BL_READ_OTP				0x5B
+#define BL_GET_RDP_LEVEL		0x58
+#define BL_SET_RDP_LEVEL		0x59
+#define BL_ENABLE_WRP			0x5A
+#define BL_DISABLE_WRP			0x5B
+#define	BL_GET_WRP_STATUS		0x5C
+#define BL_READ_OTP				0x5D
 
 
 /* Bootloader ACK and NACK bytes */
@@ -195,6 +195,9 @@ void Bootloader_Jump_To_User_App(void);
 
 #define ADDR_VALID 				0
 #define ADDR_INVALID			1
+
+#define RDP_VALID				0
+#define RDP_INVALID				1
 
 #define INVALID_NUM_OF_SECTORS	4
 
