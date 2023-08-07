@@ -48,7 +48,7 @@ BL_READ_MEM_LEN			= 11
 BL_WRITE_MEM_LEN 		= 11
 BL_GET_RDP_LEVEL_LEN	= 6
 BL_SET_RDP_LEVEL_LEN	= 7
-BL_ENABLE_WRP_LEN		= 7
+BL_ENABLE_WRP_LEN		= 8
 BL_DISABLE_WRP_LEN		= 6
 BL_GET_WRP_STATUS_LEN	= 6
 #BL_READ_OTP_LEN			= 6
@@ -246,17 +246,10 @@ def process_BL_WRITE_MEM(length):
 # TODO: Delete this function since it is not necessary for STM32F407xx MCU
 protection_mode= [ "Write Protection", "Read/Write Protection","No protection" ]
 def protection_type(status,n):
-    if( status & (1 << 15) ):
-        #PCROP is active
-        if(status & (1 << n) ):
-            return protection_mode[1]
-        else:
-            return protection_mode[2]
+    if(status & (1 << n)):
+        return protection_mode[2]
     else:
-        if(status & (1 << n)):
-            return protection_mode[2]
-        else:
-            return protection_mode[0]
+        return protection_mode[0]
 
 # 0x58
 def process_BL_GET_RDP_LEVEL(length):
@@ -295,24 +288,23 @@ def process_BL_DISABLE_WRP(length):
         print("\n   SUCCESS")
 
 # 0x5C
+# TODO: This function needs update. Check if 2-byte long 'nwrp' is transformed
+# into correct output
 def process_BL_GET_WRP_STATUS(length):
-    s_status = 0
+    nwrp = 0
 
     value = read_serial_port(length)
-    s_status = bytearray(value)
+    nwrp = bytearray(value)
     #s_status.flash_sector_status = (uint16_t)(status[1] << 8 | status[0] )
-    print("\n   Sector Status : ", s_status[0])
+    #print("\n   Sector Status : ", s_status[0])
     print("\n  ====================================")
     print("\n  Sector                               \tProtection") 
     print("\n  ====================================")
-    if(s_status[0] & (1 << 15)):
-        #PCROP is active
-        print("\n  Flash protection mode : Read/Write Protection(PCROP)\n")
-    else:
-        print("\n  Flash protection mode :   \tWrite Protection\n")
 
     for x in range(8):
-        print("\n   Sector{0}                               {1}".format(x,protection_type(s_status[0],x) ) )
+        print("\n   Sector{0}                               {1}".format(x,protection_type(nwrp[0],x) ) )
+    for x in range(4):
+        print("\n   Sector{0}                               {1}".format(x,protection_type(nwrp[1],x) ) )
         
 def decode_menu_command_code(command):
     ret_value = 0
@@ -405,10 +397,10 @@ def decode_menu_command_code(command):
         print("\n   Command == > BL_ERASE_FLASH")
         data_buf[0] = BL_ERASE_FLASH_LEN-1 
         data_buf[1] = BL_ERASE_FLASH 
-        sector_num = input("\n   Enter sector number(0-7 or 0xFF) here :")
+        sector_num = input("\n   Enter sector number(0-11 or 0xFF) here :")
         sector_num = int(sector_num, 16)
         if(sector_num != 0xff):
-            nsec=int(input("\n   Enter number of sectors to erase(max 8) here :"))
+            nsec=int(input("\n   Enter number of sectors to erase(max 12) here :"))
         else:
             nsec=0  # Added by Kyungjae Lee to resolve an issue when sector_num=0xff
         
@@ -522,13 +514,22 @@ def decode_menu_command_code(command):
         
         ret_value = read_bootloader_reply(data_buf[1])
 
-    # TODO: Rewrite the function
     elif(command == 9):
         print("\n   Command == > BL_SET_RDP_LEVEL")
         print("\n   Read Protection Level 0: 0 - No read protection")
         print("\n   Read Protection Level 1: 1 - Memory read protection")
         print("\n   Read Protection Level 2: 2 - Chip read protection (Be careful!!! It's irreversible!)")
         rdp_level = int(input("\n   Enter the RDP level to set:"))
+        if(rdp_level != 0 and rdp_level != 1 and rdp_level != 2):
+            printf("\n   Invalid RDP level. Command Dropped.")
+            return
+        if(rdp_level == 2):
+            print("""
+                \n   In this program, you are not allowed to transition to 
+                RDP Level 2 since it is an irreversible transition. Please try
+                RDP Level 0 or 1.
+                """)
+            return
         data_buf[0] = BL_SET_RDP_LEVEL_LEN-1
         data_buf[1] = BL_SET_RDP_LEVEL
         data_buf[2] = rdp_level;
@@ -546,33 +547,20 @@ def decode_menu_command_code(command):
         
         ret_value = read_bootloader_reply(data_buf[1])
 
-# TODO: Start updating from here! 
     elif(command == 10):
         print("\n   Command == > BL_ENABLE_WRP")
         total_sector = int(input("\n   How many sectors do you want to write protect ?: "))
-        sector_numbers = [0,0,0,0,0,0,0,0]
-        sector_details=0
+        sector_numbers = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]   # 12 sectors (MCU specific)
+        sector_not_write_protect = 0 
         for x in range(total_sector):
-            sector_numbers[x]=int(input("\n   Enter sector number[{0}]: ".format(x+1) ))
-            sector_details = sector_details | (1 << sector_numbers[x])
-
-        #print("Sector details",sector_details)
-        print("\n   Read Protection Level 0: 0 - No read protection");
-        print("\n   Read Protection Level 1: 1 - Memory read protection");
-        print("\n   Read Protection Level 0: 0 - Chip read protection (Be careful!)");
-        mode=input("\n   Enter Read protection level(0/1/2 ):")
-        mode = int(mode)
-        if(mode != 2 and mode != 1 and mode != 0):
-            printf("\n   Invalid option : Command Dropped")
-            return
-        if(mode == 2):
-            print("\n   This feature is currently not supported !") 
-            return
+#TODO: Optimize the output string
+            sector_numbers[x] = int(input("\n   Enter sector number[{0}]: ".format(x + 1)))
+            sector_details = sector_not_write_protect | (1 << sector_numbers[x])
 
         data_buf[0] = BL_ENABLE_WRP_LEN-1 
         data_buf[1] = BL_ENABLE_WRP 
-        data_buf[2] = sector_details 
-        data_buf[3] = mode 
+        data_buf[2] = (sector_not_write_protect >> 8) & 0x0F
+        data_buf[3] = sector_not_write_protect & 0xFF
         crc32       = get_crc(data_buf,BL_ENABLE_WRP_LEN-4) 
         data_buf[4] = word_to_byte(crc32,1,1) 
         data_buf[5] = word_to_byte(crc32,2,1) 
@@ -626,26 +614,8 @@ def decode_menu_command_code(command):
         print("\n   This command is not supported")
 
         
-    # TODO: Remove or modify the following function
-    elif(command == 14):
-        print("\n   Command == > COMMAND_BL_MY_NEW_COMMAND ")
-        data_buf[0] = COMMAND_BL_MY_NEW_COMMAND_LEN-1 
-        data_buf[1] = COMMAND_BL_MY_NEW_COMMAND 
-        crc32       = get_crc(data_buf,COMMAND_BL_MY_NEW_COMMAND_LEN-4) 
-        data_buf[2] = word_to_byte(crc32,1,1) 
-        data_buf[3] = word_to_byte(crc32,2,1) 
-        data_buf[4] = word_to_byte(crc32,3,1) 
-        data_buf[5] = word_to_byte(crc32,4,1) 
-
-        Write_to_serial_port(data_buf[0],1)
-        
-        for i in data_buf[1:COMMAND_BL_MY_NEW_COMMAND_LEN]:
-            Write_to_serial_port(i,COMMAND_BL_MY_NEW_COMMAND_LEN-1)
-        
-        ret_value = read_bootloader_reply(data_buf[1])
-
     else:
-        print("\n   Please input valid command code\n")
+        print("\n   Please enter a valid menu\n")
         return
 
     if ret_value == -2 :
