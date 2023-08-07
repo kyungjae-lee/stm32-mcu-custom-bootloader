@@ -83,7 +83,8 @@ uint8_t Set_Flash_RDP_Level(uint8_t rdpLevel);
 uint8_t Verify_Addr(uint32_t addr);
 uint8_t Execute_Flash_Erase(uint8_t sectorNumber, uint8_t numberOfSectors);
 uint8_t Execute_Memory_Write(uint8_t *pBuffer, uint32_t memAddr, uint32_t len);
-uint8_t Configure_Flash_WRP(uint8_t nwrp, uint8_t disable);
+uint8_t Configure_Flash_WRP(uint16_t nwrp, uint8_t disable);
+uint16_t Read_nWRP_Status(void);
 
 /* Bootloader function prototypes */
 void Bootloader_UART_Read_Data(void);

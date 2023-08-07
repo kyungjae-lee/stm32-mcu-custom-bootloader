@@ -1024,7 +1024,7 @@ void Bootloader_SetRDPLevel_Cmd_Handler(uint8_t *pBLRxBuffer)
 void Bootloader_EnableWRP_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 	uint8_t status = 0x00;
-	
+	uint16_t nwrp = 0x0000; 
 	Print_Msg("BL_DEBUG_MSG: Bootloader_EnableWRP_Cmd_Handler()\n");
 	
 	/* Total length of the command packet */
@@ -1040,8 +1040,12 @@ void Bootloader_EnableWRP_Cmd_Handler(uint8_t *pBLRxBuffer)
 		
 		/* Send ACK */
 		Bootloader_Tx_ACK(pBLRxBuffer[0], 1);
-		
-		status = Configure_Flash_WRP(pBLRxBuffer[2], 0);
+
+		/* Configure 12-bit long nwrp bit field (Not write Protect) */
+		nwrp |= (pBLRxBuffer[2] << 8) & 0xF00;				
+		nwrp |= pBLRxBuffer[3];
+
+		status = Configure_Flash_WRP(nwrp, 0);
 		
 		Print_Msg("BL_DEBUG_MSG: Write protection enable status: %#x\n", status);
 		
@@ -1109,14 +1113,14 @@ void Bootloader_DisableWRP_Cmd_Handler(uint8_t *pBLRxBuffer)
  * Brief	: Handles BL_GET_WRP_STATUS command
  * Param	: @pBLRxBuffer - Pointer to the bootloader's Rx buffer
  * Retval	: None
- * Note		: BL_GET_WRP_STATUS command is used to read the read/write 
- *			  protection status of all the sectors of the user Flash memory.
+ * Note		: BL_GET_WRP_STATUS command is used to read the Write Protection (WRP)
+ *			  status of all the sectors of the user Flash memory.
  */
 void Bootloader_GetWRPStatus_Cmd_Handler(uint8_t *pBLRxBuffer)
 {
 	uint16_t status;
 	
-	Print_Msg("BL_DEBUG_MSG: Bootloader_DisableRWProtect_Cmd_Handler()\n");
+	Print_Msg("BL_DEBUG_MSG: Bootloader_GetWRPStatus_Cmd_Handler()\n");
 	
 	/* Total length of the command packet */
 	uint32_t cmdPacketLen = pBLRxBuffer[0] + 1;
@@ -1132,12 +1136,12 @@ void Bootloader_GetWRPStatus_Cmd_Handler(uint8_t *pBLRxBuffer)
 		/* Send ACK */
 		Bootloader_Tx_ACK(pBLRxBuffer[0], 2);
 		
-		//status = Read_OB_nWRP_RDP_Status();	/* TODO */
+		status = Read_nWRP_Status();
 		
-		Print_Msg("BL_DEBUG_MSG: nWRP: %#x, RDP: %#x\n", status >> 16, (status & 0xFFFF) >> 8);
+		Print_Msg("BL_DEBUG_MSG: nWRP: %#x\n", status & 0x0FFF);
 		
 		/* Send response to the host */
-		//Bootloader_UART_Write_Data(&status, 1); /* TODO */
+		Bootloader_UART_Write_Data((uint8_t *)&status, 2); /* TODO */
 	}
 	else
 	{
@@ -1283,8 +1287,8 @@ uint8_t Get_Flash_RDP_Level(void)
 	HAL_FLASHEx_OBGetConfig(&obHandle);
 	rdpStatus = (uint8_t)obHandle.RDPLevel;
 #else
-	volatile uint32_t *pOBAddr = (uint32_t *)0x1FFFC000; /* Option byte addr */
-	rdpStatus = (uint8_t)(*pOBAddr >> 8);	/* Extract bits[15:8] */
+	volatile uint32_t *pOB1Addr = (uint32_t *)0x1FFFC000; /* Option byte 1 addr */
+	rdpStatus = (uint8_t)(*pOB1Addr >> 8);	/* Extract bits[15:8] */
 #endif
 	
 	return rdpStatus;
@@ -1495,7 +1499,7 @@ uint8_t Execute_Memory_Write(uint8_t *pBuffer, uint32_t memAddr, uint32_t len)
  *			  'Bootloader_EnableWRP_Cmd_Handler()', and
  *			  'Bootloader_DisableWRP_Cmd_Handler()'
  */
-uint8_t Configure_Flash_WRP(uint8_t nwrp, uint8_t disable)
+uint8_t Configure_Flash_WRP(uint16_t nwrp, uint8_t disable)
 {
 	if (disable)
 	{
@@ -1545,6 +1549,23 @@ uint8_t Configure_Flash_WRP(uint8_t nwrp, uint8_t disable)
 	return 0;
 } /* End of Configure_Flash_WRP */
 
+/**
+ * Read_nWRP_Status()
+ * Brief	: Returns the Flash memory nWRP (Not Write Protect) status
+ * Param	: None
+ * Retval	: 16-bit nWRP status
+ * Note		: For more information, see the "Option Bytes" section of the MCU
+ *			  reference manual.
+ */
+uint16_t Read_nWRP_Status(void)
+{
+	uint16_t nwrp = 0;
+
+	volatile uint32_t *pOB2Addr = (uint32_t *)0x1FFFC008; /* Option byte 2 addr */
+	nwrp = *pOB2Addr & 0xFFF;	/* Extract bits[11:0] */
+	
+	return nwrp;
+} /* End of Read_nWRP_Status */
 
 /**
   * @brief  This function is executed in case of error occurrence.
