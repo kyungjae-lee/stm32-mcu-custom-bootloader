@@ -95,7 +95,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bootloader-command-handling-flow-chart-1691612016586-4.png" alt="bootloader-command-handling-flow-chart" width="800">
+<img src="img/bootloader-command-handling-flow-chart.png" alt="bootloader-command-handling-flow-chart" width="800">
 
 
 
@@ -118,7 +118,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bl_get_ver-1691612016586-5.png" alt="bl_get_ver" width="600">
+<img src="img/bl_get_ver.png" alt="bl_get_ver" width="600">
 
 
 
@@ -132,7 +132,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bl_get_help-1691612016586-6.png" alt="bl_get_help" width="600">
+<img src="img/bl_get_help.png" alt="bl_get_help" width="600">
 
 
 
@@ -146,7 +146,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bl_get_cid-1691612016586-7.png" alt="bl_get_cid" width="600">
+<img src="img/bl_get_cid.png" alt="bl_get_cid" width="600">
 
 
 
@@ -160,7 +160,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bl_go_to_addr-1691612016586-8.png" alt="bl_go_to_addr" width="720">
+<img src="img/bl_go_to_addr.png" alt="bl_go_to_addr" width="720">
 
 
 
@@ -173,7 +173,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bl_erase_flash-1691612016586-9.png" alt="bl_erase_flash" width="850">
+<img src="img/bl_erase_flash.png" alt="bl_erase_flash" width="850">
 
 
 
@@ -188,7 +188,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bl_read_mem-1691612016587-10.png" alt="bl_read_mem" width="800">
+<img src="img/bl_read_mem.png" alt="bl_read_mem" width="800">
 
 
 
@@ -205,7 +205,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bl_write_mem-1691612016587-11.png" alt="bl_write_mem" width="850">
+<img src="img/bl_write_mem.png" alt="bl_write_mem" width="850">
 
 
 
@@ -218,7 +218,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bl_get_rdp_level-1691612016587-12.png" alt="bl_get_rdp_level" width="600">
+<img src="img/bl_get_rdp_level.png" alt="bl_get_rdp_level" width="600">
 
 
 
@@ -242,7 +242,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bl_set_rdp_level-1691612016587-13.png" alt="bl_set_rdp_level" width="750">
+<img src="img/bl_set_rdp_level.png" alt="bl_set_rdp_level" width="750">
 
 
 
@@ -258,7 +258,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bl_enable_wrp-1691612016587-14.png" alt="bl_enable_wrp" width="700">
+<img src="img/bl_enable_wrp.png" alt="bl_enable_wrp" width="700">
 
 
 
@@ -271,7 +271,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bl_disable_wrp-1691612016587-15.png" alt="bl_disable_wrp" width="580">
+<img src="img/bl_disable_wrp.png" alt="bl_disable_wrp" width="580">
 
 
 
@@ -284,4 +284,4 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="img/bl_get_wrp_status-1691612016587-16.png" alt="bl_get_wrp_status" width="580">
+<img src="img/bl_get_wrp_status.png" alt="bl_get_wrp_status" width="580">
