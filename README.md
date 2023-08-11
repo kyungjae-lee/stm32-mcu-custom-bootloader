@@ -19,13 +19,23 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-## Host Application
+## Bootloader-Host Communication over USART Peripheral Interface
+
+### Overview
+
+
+
+<img src="D:\repos\engineers-notebook\bootloader\img\bootloader-host-communication-interfaces.png" alt="bootloader-host-communication-interfaces" width="650">
+
+
+
+### Host Application
 
 * The host application runs on a host machine and provides the user with an interactive menu of the available bootloader commands.
 
 
 
-<img src="D:\repos\engineers-notebook\bootloader\img\host-application-menu.png" alt="host-application-menu" width="600">
+<img src="D:\repos\engineers-notebook\bootloader\img\host-application-menu.png" alt="host-application-menu" width="550">
 
 
 
