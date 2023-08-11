@@ -19,6 +19,18 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
+## Host Application
+
+* The host application runs on a host machine and provides the user with an interactive menu of the available bootloader commands.
+
+
+
+<img src="D:\repos\engineers-notebook\bootloader\img\host-application-menu.png" alt="host-application-menu" width="600">
+
+
+
+
+
 ## Bootloader Design
 
 ### Bootloader Code Placement in Flash (Main) Memory
