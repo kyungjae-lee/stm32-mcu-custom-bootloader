@@ -297,14 +297,14 @@ def process_BL_GET_WRP_STATUS(length):
     nwrp = bytearray(value)
     #s_status.flash_sector_status = (uint16_t)(status[1] << 8 | status[0] )
     #print("\n   Sector Status : ", s_status[0])
-    print("\n  ====================================")
-    print("\n  Sector                               \tProtection") 
-    print("\n  ====================================")
+    print("\n   ====================================")
+    print("   Sector   \tProtection") 
+    print("   ====================================")
 
     for x in range(8):
-        print("\n   Sector{0}                               {1}".format(x,protection_type(nwrp[0],x) ) )
+        print("\n   Sector{0}: \t{1}".format(x,protection_type(nwrp[0],x) ) )
     for x in range(4):
-        print("\n   Sector{0}                               {1}".format(x,protection_type(nwrp[1],x) ) )
+        print("\n   Sector{0}: \t{1}".format(x + 8, protection_type(nwrp[1],x) ) )
         
 def decode_menu_command_code(command):
     ret_value = 0
@@ -514,22 +514,22 @@ def decode_menu_command_code(command):
         
         ret_value = read_bootloader_reply(data_buf[1])
 
+#TODO: Debug this function and the corresponding part in the bootloader code.
+#      RDP Level is not getting set.
     elif(command == 9):
         print("\n   Command == > BL_SET_RDP_LEVEL")
-        print("\n   Read Protection Level 0: 0 - No read protection")
-        print("\n   Read Protection Level 1: 1 - Memory read protection")
-        print("\n   Read Protection Level 2: 2 - Chip read protection (Be careful!!! It's irreversible!)")
+        print("\n   Read Protection Level 0: No read protection")
+        print("\n   Read Protection Level 1: Memory read protection")
+        print("\n   Read Protection Level 2: Chip read protection (Be careful!!! It's irreversible!)")
         rdp_level = int(input("\n   Enter the RDP level to set:"))
         if(rdp_level != 0 and rdp_level != 1 and rdp_level != 2):
-            printf("\n   Invalid RDP level. Command Dropped.")
+            print("\n   Invalid RDP level. Command Dropped.")
             return
         if(rdp_level == 2):
-            print("""
-                \n   In this program, you are not allowed to transition to 
-                RDP Level 2 since it is an irreversible transition. Please try
-                RDP Level 0 or 1.
-                """)
+            print("\n   This program does not allow you to transition to RDP Level 2")   
+            print("   since it is an irreversible operation. Please try Level 0 or 1.")
             return
+
         data_buf[0] = BL_SET_RDP_LEVEL_LEN-1
         data_buf[1] = BL_SET_RDP_LEVEL
         data_buf[2] = rdp_level;
