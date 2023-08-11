@@ -25,7 +25,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="D:\repos\engineers-notebook\bootloader\img\bootloader-host-communication-interfaces.png" alt="bootloader-host-communication-interfaces" width="650">
+<img src="img/bootloader-host-communication-interfaces.png" alt="custom-bootloader-memory-placement" width="650">
 
 
 
@@ -35,7 +35,7 @@ This repository contains the source code for the **STM32 MCU Custom Bootloader**
 
 
 
-<img src="D:\repos\engineers-notebook\bootloader\img\host-application-menu.png" alt="host-application-menu" width="550">
+<img src="img/host-application-menu.png" alt="host-application-menu" width="550">
 
 
 
